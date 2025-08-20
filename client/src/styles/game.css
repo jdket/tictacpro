@@ -444,6 +444,74 @@
   border-color: #666 !important;
 }
 
+.cell-dimmed:has-content {
+  color: #8b5cf6 !important;
+  font-weight: bold;
+}
+
+/* Dual Score Display */
+.dual-score-display {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.score-row-1 {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 10px;
+}
+
+.score-row-2 {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+}
+
+.score-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.score-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #4299e1;
+}
+
+/* Game Layout Updates */
+.game-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  align-items: start;
+}
+
+.level-section {
+  justify-self: start;
+}
+
+.score-section {
+  justify-self: center;
+  align-self: center;
+}
+
+.board-section {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin-top: 20px;
+}
+
 /* Special indicators */
 .blocked-indicator,
 .frozen-indicator,

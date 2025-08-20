@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import GameBoard from './GameBoard';
-import ScoreDisplay from './ScoreDisplay';
+import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
 
 const TicTacPro: React.FC = () => {
@@ -64,21 +64,33 @@ const TicTacPro: React.FC = () => {
 
       {gameState.phase === 'playing' && (
         <div className="game-area">
-          <div className="game-header">
-            <LevelDisplay level={gameState.currentLevel} />
-            <ScoreDisplay score={gameState.score} />
+          <div className="game-layout">
+            <div className="level-section">
+              <LevelDisplay level={gameState.currentLevel} />
+            </div>
+            
+            <div className="score-section">
+              <DualScoreDisplay 
+                playerScore={gameState.score} 
+                opponentScore={gameState.opponentScore} 
+              />
+            </div>
+            
+            <div></div> {/* Empty space for grid balance */}
           </div>
 
-          <GameBoard
-            board={gameState.board}
-            onCellClick={handleCellClick}
-            onCellHover={handleCellHover}
-            winningLine={gameState.winningLine}
-            ghostPreview={gameState.ghostPreview}
-            effectState={gameState.effectState}
-            showingFlash={gameState.showingFlash}
-            boardBlinking={gameState.boardBlinking}
-          />
+          <div className="board-section">
+            <GameBoard
+              board={gameState.board}
+              onCellClick={handleCellClick}
+              onCellHover={handleCellHover}
+              winningLine={gameState.winningLine}
+              ghostPreview={gameState.ghostPreview}
+              effectState={gameState.effectState}
+              showingFlash={gameState.showingFlash}
+              boardBlinking={gameState.boardBlinking}
+            />
+          </div>
         </div>
       )}
 

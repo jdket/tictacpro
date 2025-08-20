@@ -50,6 +50,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
     return board[index] || '';
   };
 
+  const getCellStyle = (index: number): React.CSSProperties => {
+    // Purple question marks for dimmed cells with content
+    if (effectState.dimmedCells.includes(index) && board[index]) {
+      return { color: '#8b5cf6', fontWeight: 'bold' };
+    }
+    return {};
+  };
+
   const isCellClickable = (index: number): boolean => {
     return board[index] === null;
   };
@@ -62,6 +70,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           className={getCellClassName(index)}
           onClick={() => isCellClickable(index) && onCellClick(index)}
           data-cell-index={index}
+          style={getCellStyle(index)}
         >
           {getCellContent(index)}
         </div>

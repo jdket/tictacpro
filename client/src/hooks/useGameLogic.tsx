@@ -38,6 +38,7 @@ const initialGameState: GameState = {
   phase: 'menu',
   currentLevel: 1,
   score: 0,
+  opponentScore: 0,
   board: Array(25).fill(null),
   currentEffect: null,
   currentObstacle: null,

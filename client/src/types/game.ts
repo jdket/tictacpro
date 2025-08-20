@@ -6,6 +6,7 @@ export interface GameState {
   phase: GamePhase;
   currentLevel: number;
   score: number;
+  opponentScore: number;
   board: CellValue[];
   currentEffect: Effect | null;
   currentObstacle: Obstacle | null;
