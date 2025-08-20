@@ -437,6 +437,13 @@
   border-color: #ffd700 !important;
 }
 
+.cell-dimmed {
+  opacity: 0.5;
+  background: rgba(128, 128, 128, 0.3) !important;
+  color: #888 !important;
+  border-color: #666 !important;
+}
+
 /* Special indicators */
 .blocked-indicator,
 .frozen-indicator,

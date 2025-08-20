@@ -76,7 +76,8 @@ export const gameData = {
     { "id":"o017","name":"Double O Chance","text":"Small chance AI places 2 O once per level","rule":"one time 20 percent chance" },
     { "id":"o018","name":"Center Tax","text":"Placing on center removes 2000 pts from this level payout","rule":"level penalty on center use" },
     { "id":"o019","name":"Edge Tax","text":"Placing on edges removes 1000 pts from this level payout","rule":"level penalty on edge use" },
-    { "id":"o020","name":"Corner Tax","text":"Placing on corners removes 1000 pts from this level payout","rule":"level penalty on corner use" }
+    { "id":"o020","name":"Corner Tax","text":"Placing on corners removes 1000 pts from this level payout","rule":"level penalty on corner use" },
+    { "id":"o021","name":"Memory Fog","text":"3 random tiles become dimmed - they show ? when played but count normally","rule":"dims 3 tiles, shows ? for content" }
   ]
 };
 

@@ -1,5 +1,5 @@
 import { CellValue } from '@/lib/stores/useGameState';
-import { getWinningLines } from '@/data/gameData';
+import { getWinningLines } from '../utils/gameUtils';
 
 export const checkWinningLine = (board: CellValue[]): number[] | null => {
   const lines = getWinningLines();
@@ -116,11 +116,11 @@ export const canPlayerWin = (board: CellValue[]): number | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    const values = line.map(i => board[i]);
+    const values = line.map((i: number) => board[i]);
     
     // Check if player has 3 X's and one empty cell (4-in-a-row)
-    if (values.filter(v => v === 'X').length === 3 && values.filter(v => v === null).length === 1) {
-      return line.find(i => board[i] === null) || null;
+    if (values.filter((v: CellValue) => v === 'X').length === 3 && values.filter((v: CellValue) => v === null).length === 1) {
+      return line.find((i: number) => board[i] === null) || null;
     }
   }
   
@@ -131,11 +131,11 @@ export const canAIWin = (board: CellValue[]): number | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    const values = line.map(i => board[i]);
+    const values = line.map((i: number) => board[i]);
     
     // Check if AI has 3 O's and one empty cell (4-in-a-row)
-    if (values.filter(v => v === 'O').length === 3 && values.filter(v => v === null).length === 1) {
-      return line.find(i => board[i] === null) || null;
+    if (values.filter((v: CellValue) => v === 'O').length === 3 && values.filter((v: CellValue) => v === null).length === 1) {
+      return line.find((i: number) => board[i] === null) || null;
     }
   }
   

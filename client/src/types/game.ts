@@ -35,6 +35,7 @@ export interface EffectState {
   hiddenCells: number[];
   frozenCells: number[];
   blockedCells: number[];
+  dimmedCells: number[];
   lastRowUsed: number | null;
   lastColumnUsed: number | null;
   trailX: number | null;

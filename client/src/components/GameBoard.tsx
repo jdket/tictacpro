@@ -29,6 +29,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
     if (board[index] === 'X') classes.push('cell-x');
     if (board[index] === 'O') classes.push('cell-o');
     
+    // Dimmed cell state - grayed out appearance
+    if (effectState.dimmedCells.includes(index)) {
+      classes.push('cell-dimmed');
+    }
+    
     // Winning line highlight
     if (winningLine && winningLine.includes(index)) {
       classes.push('cell-winner');
@@ -38,6 +43,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const getCellContent = (index: number): string => {
+    // If cell is dimmed and has content, show question mark instead
+    if (effectState.dimmedCells.includes(index) && board[index]) {
+      return '?';
+    }
     return board[index] || '';
   };
 

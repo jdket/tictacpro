@@ -13,13 +13,13 @@ export const useObstacles = (
           ...prev,
           effectState: {
             ...prev.effectState,
-            blockedCells: [4]
+            blockedCells: [12]
           }
         }));
         break;
       
       case 'o002': // Locked Corner
-        const corners = [0, 2, 6, 8];
+        const corners = [0, 4, 20, 24];
         const randomCorner = corners[Math.floor(Math.random() * corners.length)];
         setGameState(prev => ({
           ...prev,
@@ -31,7 +31,7 @@ export const useObstacles = (
         break;
       
       case 'o003': // Locked Edge
-        const edges = [1, 3, 5, 7];
+        const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
         const randomEdge = edges[Math.floor(Math.random() * edges.length)];
         setGameState(prev => ({
           ...prev,
@@ -43,7 +43,7 @@ export const useObstacles = (
         break;
       
       case 'o004': // Ice Tile
-        const randomIceCell = Math.floor(Math.random() * 9);
+        const randomIceCell = Math.floor(Math.random() * 25);
         setGameState(prev => ({
           ...prev,
           effectState: {
@@ -54,7 +54,7 @@ export const useObstacles = (
         break;
       
       case 'o005': // Fog Tile
-        const randomFogCell = Math.floor(Math.random() * 9);
+        const randomFogCell = Math.floor(Math.random() * 25);
         setGameState(prev => ({
           ...prev,
           effectState: {
@@ -65,7 +65,7 @@ export const useObstacles = (
         break;
       
       case 'o006': // Bounce Tile
-        const randomBounceCell = Math.floor(Math.random() * 9);
+        const randomBounceCell = Math.floor(Math.random() * 25);
         setGameState(prev => ({
           ...prev,
           effectState: {
@@ -76,7 +76,7 @@ export const useObstacles = (
         break;
       
       case 'o007': // Swap Tile
-        const randomSwapCell = Math.floor(Math.random() * 9);
+        const randomSwapCell = Math.floor(Math.random() * 25);
         setGameState(prev => ({
           ...prev,
           effectState: {
@@ -91,7 +91,7 @@ export const useObstacles = (
           ...prev,
           effectState: {
             ...prev.effectState,
-            hiddenCells: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+            hiddenCells: Array.from({ length: 25 }, (_, i) => i)
           }
         }));
         break;
@@ -102,6 +102,26 @@ export const useObstacles = (
           effectState: {
             ...prev.effectState,
             gravityActive: true
+          }
+        }));
+        break;
+      
+      case 'o021': // Memory Fog
+        const allCells = Array.from({ length: 25 }, (_, i) => i);
+        const randomDimmedCells: number[] = [];
+        
+        while (randomDimmedCells.length < 3) {
+          const randomCell = allCells[Math.floor(Math.random() * allCells.length)];
+          if (!randomDimmedCells.includes(randomCell)) {
+            randomDimmedCells.push(randomCell);
+          }
+        }
+        
+        setGameState(prev => ({
+          ...prev,
+          effectState: {
+            ...prev.effectState,
+            dimmedCells: randomDimmedCells
           }
         }));
         break;
@@ -198,28 +218,28 @@ export const useObstacles = (
         break;
       
       case 'o018': // Center Tax
-        if (cellIndex === 4 && player === 'player') {
+        if (cellIndex === 12 && player === 'player') {
           setGameState(prev => ({
             ...prev,
-            levelCoins: Math.max(0, prev.levelCoins - 2)
+            score: Math.max(0, prev.score - 2000)
           }));
         }
         break;
       
       case 'o019': // Edge Tax
-        if ([1, 3, 5, 7].includes(cellIndex) && player === 'player') {
+        if ([1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23].includes(cellIndex) && player === 'player') {
           setGameState(prev => ({
             ...prev,
-            levelCoins: Math.max(0, prev.levelCoins - 1)
+            score: Math.max(0, prev.score - 1000)
           }));
         }
         break;
       
       case 'o020': // Corner Tax
-        if ([0, 2, 6, 8].includes(cellIndex) && player === 'player') {
+        if ([0, 4, 20, 24].includes(cellIndex) && player === 'player') {
           setGameState(prev => ({
             ...prev,
-            levelCoins: Math.max(0, prev.levelCoins - 1)
+            score: Math.max(0, prev.score - 1000)
           }));
         }
         break;
