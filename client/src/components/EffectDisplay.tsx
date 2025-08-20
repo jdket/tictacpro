@@ -36,7 +36,15 @@ const EffectDisplay: React.FC<EffectDisplayProps> = ({ effect }) => {
       <p className="effect-description">{effect.text}</p>
       <div className="effect-value">
         {effect.type === 'scoring' || effect.type === 'economy' ? (
-          <span className="value-highlight">+{effect.value} coins</span>
+          effect.value < 10 ? (
+            <span className="value-highlight">x{effect.value} multiplier</span>
+          ) : (
+            <span className="value-highlight">+{effect.value} pts</span>
+          )
+        ) : effect.type === 'placement' && (effect.value === 3000) ? (
+          <span className="value-highlight">+{effect.value} pts</span>
+        ) : effect.type === 'memory' && (effect.value >= 1000) ? (
+          <span className="value-highlight">+{effect.value} pts</span>
         ) : effect.type === 'placement' ? (
           <span className="ability-highlight">Special Ability</span>
         ) : effect.type === 'memory' ? (
