@@ -404,7 +404,7 @@
 }
 
 .board-blinking {
-  animation: boardBlink 0.25s ease-in-out;
+  opacity: 0.3;
 }
 
 .cell {
@@ -417,13 +417,8 @@
   font-size: 3rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
   position: relative;
   border: 2px solid transparent;
-}
-
-.cell:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .cell-content {
@@ -446,7 +441,6 @@
 .winning-cell {
   background: rgba(255, 215, 0, 0.3) !important;
   border-color: #ffd700 !important;
-  animation: winPulse 1s ease-in-out infinite;
 }
 
 .ghost-preview {
@@ -472,17 +466,15 @@
 }
 
 .trail-x {
-  animation: trailGlow 2s ease-in-out;
+  background: rgba(255, 107, 107, 0.2);
 }
 
 .shadow-o {
   background: rgba(78, 205, 196, 0.2);
-  animation: shadowPulse 0.5s ease-in-out;
 }
 
 .mirror-hint {
   border-color: #a78bfa;
-  animation: mirrorFlash 1s ease-in-out;
 }
 
 .bounce-tile {
@@ -501,16 +493,15 @@
 }
 
 .flash-cell {
-  animation: flashEffect 1s ease-in-out;
+  background: rgba(255, 215, 0, 0.5);
 }
 
 .blinking {
-  animation: cellBlink 0.25s ease-in-out;
+  opacity: 0.5;
 }
 
 .memory-cell {
   border-color: #4ecdc4;
-  animation: memoryPulse 2s ease-in-out infinite;
 }
 
 /* Special indicators */
