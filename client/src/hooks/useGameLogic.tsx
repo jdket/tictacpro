@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, CellValue, Effect, Obstacle, EffectType } from '../types/game';
 import { gameData } from '../data/gameData';
-import { checkWinningLine, checkPlayerWinningLines, isBoardFull, getEmptyCells } from '../utils/gameUtils';
+import { checkWinningLine, checkPlayerWinningLines, checkNewWinningLines, isBoardFull, getEmptyCells } from '../utils/gameUtils';
 import { useEffects } from './useEffects';
 import { useObstacles } from './useObstacles';
 
@@ -233,9 +233,9 @@ export const useGameLogic = () => {
       const newMoveHistory = [...prev.moveHistory, cellIndex];
       const isCenter = cellIndex === 4;
       
-      // Check for player X winning lines only
-      const playerWinningLines = checkPlayerWinningLines(newBoard, 'X');
-      const lineCount = playerWinningLines.length;
+      // Check for NEW player X winning lines created by this move only
+      const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex);
+      const lineCount = newWinningLines.length;
       
       let scoreIncrease = 0;
       let newWinningLine = prev.winningLine;
@@ -250,10 +250,10 @@ export const useGameLogic = () => {
           console.log(`Player created ${lineCount} lines! Bonus awarded!`);
         }
         
-        // Use the first winning line for display
-        newWinningLine = playerWinningLines[0];
+        // Use the first winning line for display (or keep existing if we already had one)
+        newWinningLine = newWinningLines[0];
         
-        console.log(`Player scored ${scoreIncrease} points for ${lineCount} line(s)`);
+        console.log(`Player scored ${scoreIncrease} points for ${lineCount} NEW line(s)`);
       }
       
       // Check if board is complete after player move

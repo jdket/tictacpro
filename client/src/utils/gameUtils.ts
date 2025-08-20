@@ -33,6 +33,21 @@ export const checkPlayerWinningLines = (board: CellValue[], player: 'X' | 'O'): 
   return winningLines;
 };
 
+export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', lastMove: number): number[][] => {
+  const lines = getWinningLines();
+  const winningLines: number[][] = [];
+  
+  for (const line of lines) {
+    const [a, b, c] = line;
+    // Only check lines that include the cell that was just played
+    if (line.includes(lastMove) && board[a] === player && board[b] === player && board[c] === player) {
+      winningLines.push(line);
+    }
+  }
+  
+  return winningLines;
+};
+
 export const isBoardFull = (board: CellValue[]): boolean => {
   return board.every(cell => cell !== null);
 };
