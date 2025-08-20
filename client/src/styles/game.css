@@ -389,119 +389,52 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Game Board */
-.game-board {
+/* New Static Game Board */
+.tic-tac-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4px;
+  width: 360px;
+  height: 360px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 400px;
   margin: 0 auto;
 }
 
-.board-blinking {
-  opacity: 0.3;
-}
-
-.cell {
-  aspect-ratio: 1;
+.game-cell {
+  width: 100px;
+  height: 100px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3rem;
   font-weight: bold;
   cursor: pointer;
-  position: relative;
   border: 2px solid transparent;
+  box-sizing: border-box;
 }
 
-.cell-content {
-  z-index: 2;
-  position: relative;
-}
-
-.x-cell {
+.cell-x {
   color: #ff6b6b;
   background: rgba(255, 107, 107, 0.1);
   border-color: #ff6b6b;
 }
 
-.o-cell {
+.cell-o {
   color: #4ecdc4;
   background: rgba(78, 205, 196, 0.1);
   border-color: #4ecdc4;
 }
 
-.winning-cell {
+.cell-winner {
   background: rgba(255, 215, 0, 0.3) !important;
   border-color: #ffd700 !important;
-}
-
-.ghost-preview {
-  color: rgba(255, 107, 107, 0.5);
-  background: rgba(255, 107, 107, 0.1);
-  border-color: rgba(255, 107, 107, 0.5);
-}
-
-.blocked-cell {
-  background: rgba(150, 150, 150, 0.3) !important;
-  cursor: not-allowed !important;
-  border-color: #666 !important;
-}
-
-.frozen-cell {
-  background: rgba(173, 216, 230, 0.3) !important;
-  border-color: #87ceeb !important;
-}
-
-.hidden-cell .cell-content {
-  opacity: 0.3;
-  filter: blur(2px);
-}
-
-.trail-x {
-  background: rgba(255, 107, 107, 0.2);
-}
-
-.shadow-o {
-  background: rgba(78, 205, 196, 0.2);
-}
-
-.mirror-hint {
-  border-color: #a78bfa;
-}
-
-.bounce-tile {
-  background: rgba(255, 165, 0, 0.2);
-  border-color: #ffa500;
-}
-
-.swap-tile {
-  background: rgba(138, 43, 226, 0.2);
-  border-color: #8a2be2;
-}
-
-.wind-blocked {
-  background: rgba(100, 100, 100, 0.4) !important;
-  cursor: not-allowed !important;
-}
-
-.flash-cell {
-  background: rgba(255, 215, 0, 0.5);
-}
-
-.blinking {
-  opacity: 0.5;
-}
-
-.memory-cell {
-  border-color: #4ecdc4;
 }
 
 /* Special indicators */
