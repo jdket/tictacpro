@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, CellValue, Effect, Obstacle, EffectType } from '../types/game';
 import { gameData } from '../data/gameData';
-import { checkWinningLine, isBoardFull, getRandomEmptyCell } from '../utils/gameUtils';
+import { checkWinningLine, isBoardFull, getEmptyCells } from '../utils/gameUtils';
 import { useEffects } from './useEffects';
 import { useObstacles } from './useObstacles';
 
@@ -141,9 +141,72 @@ export const useGameLogic = () => {
     }));
   }, [gameState.currentLevel]);
 
+  const makeAIMove = useCallback(() => {
+    setGameState(prev => {
+      console.log('AI making move, board before AI move:', prev.board);
+      
+      const emptyCells = getEmptyCells(prev.board);
+      if (emptyCells.length === 0) return prev;
+      
+      let aiMoveIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      
+      // Apply AI behavior based on effects
+      if (prev.currentEffect && aiMoveIndex !== null) {
+        const corners = [0, 2, 6, 8];
+        const edges = [1, 3, 5, 7];
+        const center = 4;
+
+        switch (prev.currentEffect.id) {
+          case 'e031': // O Drift - prefers edges
+            const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+            aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+            break;
+          
+          case 'e032': // O Corner Habit - prefers corners
+            const emptyCorners = corners.filter(corner => prev.board[corner] === null);
+            aiMoveIndex = emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
+            break;
+          
+          case 'e033': // O Avoid Center
+            const nonCenterEmpty = emptyCells.filter(cell => cell !== center);
+            aiMoveIndex = nonCenterEmpty.length > 0 ? nonCenterEmpty[Math.floor(Math.random() * nonCenterEmpty.length)] : aiMoveIndex;
+            break;
+          
+          case 'e039': // O Center Rush
+            aiMoveIndex = prev.board[center] === null ? center : aiMoveIndex;
+            break;
+          
+          case 'e040': // O Edge Rush
+            if (prev.lastAIMove === null) {
+              const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+              aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+            }
+            break;
+        }
+      }
+
+      console.log('AI choosing cell:', aiMoveIndex);
+      
+      const newBoard = [...prev.board];
+      newBoard[aiMoveIndex] = 'O';
+      
+      console.log('Board after AI move:', newBoard);
+      
+      // Check if level is complete
+      const isComplete = isBoardFull(newBoard);
+      
+      console.log('Board is complete:', isComplete);
+      
+      return {
+        ...prev,
+        board: newBoard,
+        lastAIMove: aiMoveIndex,
+        phase: isComplete ? 'level_complete' : prev.phase
+      };
+    });
+  }, []);
+
   const makeMove = useCallback((cellIndex: number): boolean => {
-    let moveSuccess = false;
-    
     setGameState(prev => {
       // Validation
       if (prev.phase !== 'playing' || prev.board[cellIndex] !== null) {
@@ -164,8 +227,6 @@ export const useGameLogic = () => {
       // Check for winning line
       const winningLine = checkWinningLine(newBoard);
       
-      moveSuccess = true;
-      
       return {
         ...prev,
         board: newBoard,
@@ -178,76 +239,15 @@ export const useGameLogic = () => {
       };
     });
 
-    if (moveSuccess) {
-      // Schedule AI move after a short delay
-      setTimeout(() => {
-        makeAIMove();
-      }, 300);
-    }
+    // Schedule AI move after a short delay
+    setTimeout(() => {
+      makeAIMove();
+    }, 300);
 
-    return moveSuccess;
-  }, []);
+    return true;
+  }, [makeAIMove]);
 
-  const makeAIMove = useCallback(() => {
-    setGameState(prev => {
-      console.log('AI making move, board before AI move:', prev.board);
-      
-      let aiMoveIndex = getRandomEmptyCell(prev.board, []);
-      
-      // Apply AI behavior based on effects
-      if (prev.currentEffect && aiMoveIndex !== null) {
-        const corners = [0, 2, 6, 8];
-        const edges = [1, 3, 5, 7];
-        const center = 4;
 
-        switch (prev.currentEffect.id) {
-          case 'e031': // O Drift - prefers edges
-            const emptyEdges = edges.filter(edge => prev.board[edge] === null);
-            aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
-            break;
-          
-          case 'e032': // O Corner Habit - prefers corners
-            const emptyCorners = corners.filter(corner => prev.board[corner] === null);
-            aiMoveIndex = emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
-            break;
-          
-          case 'e033': // O Avoid Center
-            aiMoveIndex = aiMoveIndex === center ? (getRandomEmptyCell(prev.board, [center]) || aiMoveIndex) : aiMoveIndex;
-            break;
-          
-          case 'e039': // O Center Rush
-            aiMoveIndex = prev.board[center] === null ? center : aiMoveIndex;
-            break;
-          
-          case 'e040': // O Edge Rush
-            if (prev.lastAIMove === null) {
-              const emptyEdges = edges.filter(edge => prev.board[edge] === null);
-              aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
-            }
-            break;
-        }
-      }
-
-      if (aiMoveIndex === null) return prev;
-
-      console.log('AI choosing cell:', aiMoveIndex);
-      
-      const newBoard = [...prev.board];
-      newBoard[aiMoveIndex] = 'O';
-      
-      console.log('Board after AI move:', newBoard);
-      
-      // Check if level is complete
-      const isComplete = isBoardFull(newBoard);
-      
-      return {
-        ...prev,
-        board: newBoard,
-        lastAIMove: aiMoveIndex,
-        phase: isComplete ? 'level_complete' : prev.phase
-      };
-    });
-  }, []);
 
 
 
