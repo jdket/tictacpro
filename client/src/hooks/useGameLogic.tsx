@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, CellValue, Effect, Obstacle, EffectType } from '../types/game';
 import { gameData } from '../data/gameData';
-import { checkWinningLine, isBoardFull, getEmptyCells } from '../utils/gameUtils';
+import { checkWinningLine, checkPlayerWinningLines, isBoardFull, getEmptyCells } from '../utils/gameUtils';
 import { useEffects } from './useEffects';
 import { useObstacles } from './useObstacles';
 
@@ -233,8 +233,28 @@ export const useGameLogic = () => {
       const newMoveHistory = [...prev.moveHistory, cellIndex];
       const isCenter = cellIndex === 4;
       
-      // Check for winning line
-      const winningLine = checkWinningLine(newBoard);
+      // Check for player X winning lines only
+      const playerWinningLines = checkPlayerWinningLines(newBoard, 'X');
+      const lineCount = playerWinningLines.length;
+      
+      let scoreIncrease = 0;
+      let newWinningLine = prev.winningLine;
+      
+      if (lineCount > 0) {
+        // Base points: 1000 per line
+        scoreIncrease = lineCount * 1000;
+        
+        // Bonus for multiple lines: 500 extra points
+        if (lineCount >= 2) {
+          scoreIncrease += 500;
+          console.log(`Player created ${lineCount} lines! Bonus awarded!`);
+        }
+        
+        // Use the first winning line for display
+        newWinningLine = playerWinningLines[0];
+        
+        console.log(`Player scored ${scoreIncrease} points for ${lineCount} line(s)`);
+      }
       
       // Check if board is complete after player move
       const isComplete = isBoardFull(newBoard);
@@ -247,8 +267,8 @@ export const useGameLogic = () => {
         lastPlayerMove: cellIndex,
         firstMoveWasCenter: prev.moveHistory.length === 0 && isCenter,
         usedCenter: prev.usedCenter || isCenter,
-        winningLine: winningLine || prev.winningLine,
-        score: winningLine ? prev.score + 1000 : prev.score,
+        winningLine: newWinningLine,
+        score: prev.score + scoreIncrease,
         phase: isComplete ? 'level_complete' : prev.phase
       };
     });
