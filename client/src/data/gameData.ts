@@ -1,14 +1,14 @@
 // Game data based on the provided JSON structure
 export const gameData = {
   "effects": [
-    { "id":"e001","name":"Center Boost","type":"scoring","text":"Lines through center give +5000 pts","value":5000 },
+    { "id":"e001","name":"Center Boost","type":"scoring","text":"4-in-a-row lines through center give +5000 pts","value":5000 },
     { "id":"e002","name":"Corner Bonus","type":"scoring","text":"+2000 pts per corner used in a line","value":2000 },
     { "id":"e003","name":"Edge Bonus","type":"scoring","text":"+1000 pts per edge used in a line","value":1000 },
     { "id":"e004","name":"Combo Counter","type":"scoring","text":"Each line this level raises a combo, each next line +3000 pts","value":3000 },
-    { "id":"e005","name":"Diagonal Doubler","type":"scoring","text":"Diagonal lines pay x2","value":2 },
-    { "id":"e006","name":"Row Runner","type":"scoring","text":"Horizontal lines +4000 pts","value":4000 },
-    { "id":"e007","name":"Column Climber","type":"scoring","text":"Vertical lines +4000 pts","value":4000 },
-    { "id":"e008","name":"Triple Cherry","type":"scoring","text":"If you make 3 lines this level, final payout x2","value":2 },
+    { "id":"e005","name":"Diagonal Doubler","type":"scoring","text":"Diagonal 4-in-a-row lines pay x2","value":2 },
+    { "id":"e006","name":"Row Runner","type":"scoring","text":"Horizontal 4-in-a-row lines +4000 pts","value":4000 },
+    { "id":"e007","name":"Column Climber","type":"scoring","text":"Vertical 4-in-a-row lines +4000 pts","value":4000 },
+    { "id":"e008","name":"Triple Cherry","type":"scoring","text":"If you make 3 four-in-a-row lines this level, final payout x2","value":2 },
     { "id":"e009","name":"Perfect Fill","type":"scoring","text":"If the board fills this level, +8000 pts","value":8000 },
     { "id":"e010","name":"Quick Start","type":"scoring","text":"If your first move is center, +6000 pts","value":6000 },
 
@@ -92,15 +92,19 @@ export const getRandomObstacle = (): Obstacle => {
   return gameData.obstacles[Math.floor(Math.random() * gameData.obstacles.length)];
 };
 
-// Utility functions for game logic
-export const getWinningLines = (): number[][] => [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-  [0, 4, 8], [2, 4, 6] // diagonals
-];
+// Utility functions for game logic - moved to gameUtils.ts to avoid duplication
 
 export const getCellType = (index: number): 'corner' | 'edge' | 'center' => {
-  if (index === 4) return 'center';
-  if ([0, 2, 6, 8].includes(index)) return 'corner';
+  // For 5x5 board (indices 0-24)
+  const row = Math.floor(index / 5);
+  const col = index % 5;
+  
+  // Center is position (2,2) = index 12
+  if (row === 2 && col === 2) return 'center';
+  
+  // Corners are (0,0), (0,4), (4,0), (4,4) = indices 0, 4, 20, 24
+  if ((row === 0 || row === 4) && (col === 0 || col === 4)) return 'corner';
+  
+  // Everything else is edge
   return 'edge';
 };

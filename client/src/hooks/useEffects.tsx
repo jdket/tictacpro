@@ -20,12 +20,12 @@ export const useEffects = (
     switch (effect.id) {
       // Scoring Effects
       case 'e001': // Center Boost
-        if (winningLine && winningLine.includes(4)) coins += effect.value;
+        if (winningLine && winningLine.includes(12)) coins += effect.value;
         break;
       
       case 'e002': // Corner Bonus
         if (winningLine) {
-          const corners = [0, 2, 6, 8];
+          const corners = [0, 4, 20, 24];
           const cornerCount = winningLine.filter(cell => corners.includes(cell)).length;
           coins += cornerCount * effect.value;
         }
@@ -33,20 +33,14 @@ export const useEffects = (
       
       case 'e003': // Edge Bonus
         if (winningLine) {
-          const edges = [1, 3, 5, 7];
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
           const edgeCount = winningLine.filter(cell => edges.includes(cell)).length;
           coins += edgeCount * effect.value;
         }
         break;
       
       case 'e004': // Combo Counter
-        if (winningLine) {
-          setGameState(prev => ({
-            ...prev,
-            comboCount: prev.comboCount + 1
-          }));
-          coins += gameState.comboCount * effect.value;
-        }
+        // TODO: Implement combo counter logic when comboCount is added to GameState
         break;
       
       case 'e005': // Diagonal Doubler
@@ -68,9 +62,7 @@ export const useEffects = (
         break;
       
       case 'e008': // Triple Cherry
-        if (context === 'level_end' && gameState.linesCompleted === 3) {
-          multiplier = effect.value;
-        }
+        // TODO: Implement when linesCompleted is tracked in GameState
         break;
       
       case 'e009': // Perfect Fill
@@ -80,14 +72,14 @@ export const useEffects = (
         break;
       
       case 'e010': // Quick Start
-        if (cellIndex === 4 && gameState.moveCount === 1) {
+        if (cellIndex === 12 && gameState.firstMoveWasCenter) {
           coins += effect.value;
         }
         break;
       
       case 'e017': // Edge Magnet
-        if (winningLine && gameState.moveCount === 1) {
-          const edges = [1, 3, 5, 7];
+        if (winningLine && gameState.moveHistory.length === 1) {
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
           if (winningLine.some(cell => edges.includes(cell))) {
             coins += effect.value;
           }
@@ -95,8 +87,8 @@ export const useEffects = (
         break;
       
       case 'e018': // Corner Magnet
-        if (winningLine && gameState.moveCount === 1) {
-          const corners = [0, 2, 6, 8];
+        if (winningLine && gameState.moveHistory.length === 1) {
+          const corners = [0, 4, 20, 24];
           if (winningLine.some(cell => corners.includes(cell))) {
             coins += effect.value;
           }
@@ -104,14 +96,17 @@ export const useEffects = (
         break;
       
       case 'e025': // Hide Corners
-        if (cellIndex !== -1 && [0, 2, 6, 8].includes(cellIndex)) {
+        if (cellIndex !== -1 && [0, 4, 20, 24].includes(cellIndex)) {
           coins += effect.value;
         }
         break;
       
       case 'e026': // Hide Edges
-        if (cellIndex !== -1 && [1, 3, 5, 7].includes(cellIndex)) {
-          coins += effect.value;
+        if (cellIndex !== -1) {
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+          if (edges.includes(cellIndex)) {
+            coins += effect.value;
+          }
         }
         break;
       
@@ -120,7 +115,7 @@ export const useEffects = (
         break;
       
       case 'e042': // Streak Saver
-        if (gameState.streakCount >= 2) coins += effect.value;
+        // TODO: Implement when streakCount is tracked in GameState
         break;
       
       case 'e043': // Even Up
@@ -136,9 +131,7 @@ export const useEffects = (
         break;
       
       case 'e045': // First Line Boost
-        if (winningLine && gameState.linesCompleted === 0) {
-          multiplier = effect.value;
-        }
+        // TODO: Implement when linesCompleted is tracked in GameState
         break;
       
       case 'e046': // Last Line Boost
@@ -148,9 +141,7 @@ export const useEffects = (
         break;
       
       case 'e047': // Two Line Gift
-        if (context === 'level_end' && gameState.linesCompleted === 2) {
-          coins += effect.value;
-        }
+        // TODO: Implement when linesCompleted is tracked in GameState
         break;
       
       case 'e048': // No Center Gift
@@ -161,7 +152,7 @@ export const useEffects = (
       
       case 'e049': // Corner Collector
         if (context === 'level_end') {
-          const corners = [0, 2, 6, 8];
+          const corners = [0, 4, 20, 24];
           if (corners.every(corner => gameState.board[corner] !== null)) {
             coins += effect.value;
           }
@@ -169,9 +160,7 @@ export const useEffects = (
         break;
       
       case 'e050': // Saver
-        if (context === 'level_end') {
-          coins += Math.floor(gameState.totalCoins * effect.value);
-        }
+        // TODO: Implement when totalCoins is tracked in GameState
         break;
     }
 
@@ -181,8 +170,8 @@ export const useEffects = (
   const initializeEffect = useCallback((effect: Effect) => {
     switch (effect.id) {
       case 'e011': // Lucky Corner
-        if (gameState.moveCount === 0) {
-          const corners = [0, 2, 6, 8];
+        if (gameState.moveHistory.length === 0) {
+          const corners = [0, 4, 20, 24];
           const emptyCorners = corners.filter(c => gameState.board[c] === null);
           if (emptyCorners.length > 0) {
             const randomCorner = emptyCorners[Math.floor(Math.random() * emptyCorners.length)];
@@ -192,7 +181,7 @@ export const useEffects = (
               return {
                 ...prev,
                 board: newBoard,
-                moveCount: 1,
+                moveHistory: [randomCorner],
                 lastPlayerMove: randomCorner
               };
             });
@@ -201,15 +190,15 @@ export const useEffects = (
         break;
       
       case 'e015': // Free Center
-        if (gameState.moveCount === 0 && gameState.board[4] === null) {
+        if (gameState.moveHistory.length === 0 && gameState.board[12] === null) {
           setGameState(prev => {
             const newBoard = [...prev.board];
-            newBoard[4] = 'X';
+            newBoard[12] = 'X';
             return {
               ...prev,
               board: newBoard,
-              moveCount: 1,
-              lastPlayerMove: 4,
+              moveHistory: [12],
+              lastPlayerMove: 12,
               firstMoveWasCenter: true,
               usedCenter: true
             };

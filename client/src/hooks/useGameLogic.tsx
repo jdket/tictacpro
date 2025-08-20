@@ -38,7 +38,7 @@ const initialGameState: GameState = {
   phase: 'menu',
   currentLevel: 1,
   score: 0,
-  board: Array(9).fill(null),
+  board: Array(25).fill(null),
   currentEffect: null,
   currentObstacle: null,
   nextLevelEffects: [],
@@ -159,9 +159,9 @@ export const useGameLogic = () => {
       
       // Apply AI behavior based on effects
       if (prev.currentEffect && aiMoveIndex !== null) {
-        const corners = [0, 2, 6, 8];
-        const edges = [1, 3, 5, 7];
-        const center = 4;
+        const corners = [0, 4, 20, 24];
+        const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+        const center = 12;
 
         switch (prev.currentEffect.id) {
           case 'e031': // O Drift - prefers edges
@@ -229,7 +229,7 @@ export const useGameLogic = () => {
       console.log('Board after player move:', newBoard);
       
       const newMoveHistory = [...prev.moveHistory, cellIndex];
-      const isCenter = cellIndex === 4;
+      const isCenter = cellIndex === 12;
       
       // Check for NEW player X winning lines created by this move only
       const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex);

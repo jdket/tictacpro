@@ -389,14 +389,14 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* New Static Game Board */
+/* New Static Game Board - 5x5 Grid */
 .tic-tac-board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   gap: 4px;
-  width: 360px;
-  height: 360px;
+  width: 500px;
+  height: 500px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -406,14 +406,14 @@
 }
 
 .game-cell {
-  width: 100px;
-  height: 100px;
+  width: 88px;
+  height: 88px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
   cursor: pointer;
   border: 2px solid transparent;

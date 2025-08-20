@@ -1,17 +1,61 @@
 import { CellValue } from '../types/game';
 
-export const getWinningLines = (): number[][] => [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-  [0, 4, 8], [2, 4, 6] // diagonals
-];
+export const getWinningLines = (): number[][] => {
+  const lines: number[][] = [];
+  
+  // Rows (4-in-a-row horizontally)
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col <= 1; col++) { // 5-4+1 = 2 starting positions per row
+      const line = [];
+      for (let i = 0; i < 4; i++) {
+        line.push(row * 5 + col + i);
+      }
+      lines.push(line);
+    }
+  }
+  
+  // Columns (4-in-a-row vertically)
+  for (let col = 0; col < 5; col++) {
+    for (let row = 0; row <= 1; row++) { // 5-4+1 = 2 starting positions per column
+      const line = [];
+      for (let i = 0; i < 4; i++) {
+        line.push((row + i) * 5 + col);
+      }
+      lines.push(line);
+    }
+  }
+  
+  // Diagonals (4-in-a-row diagonally)
+  // Top-left to bottom-right
+  for (let row = 0; row <= 1; row++) {
+    for (let col = 0; col <= 1; col++) {
+      const line = [];
+      for (let i = 0; i < 4; i++) {
+        line.push((row + i) * 5 + (col + i));
+      }
+      lines.push(line);
+    }
+  }
+  
+  // Top-right to bottom-left
+  for (let row = 0; row <= 1; row++) {
+    for (let col = 3; col < 5; col++) {
+      const line = [];
+      for (let i = 0; i < 4; i++) {
+        line.push((row + i) * 5 + (col - i));
+      }
+      lines.push(line);
+    }
+  }
+  
+  return lines;
+};
 
 export const checkWinningLine = (board: CellValue[]): number[] | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    const [a, b, c] = line;
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+    if (line.every(cell => board[cell] && board[cell] === board[line[0]])) {
       return line;
     }
   }
@@ -24,8 +68,7 @@ export const checkPlayerWinningLines = (board: CellValue[], player: 'X' | 'O'): 
   const winningLines: number[][] = [];
   
   for (const line of lines) {
-    const [a, b, c] = line;
-    if (board[a] === player && board[b] === player && board[c] === player) {
+    if (line.every(cell => board[cell] === player)) {
       winningLines.push(line);
     }
   }
@@ -38,9 +81,8 @@ export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', last
   const winningLines: number[][] = [];
   
   for (const line of lines) {
-    const [a, b, c] = line;
     // Only check lines that include the cell that was just played
-    if (line.includes(lastMove) && board[a] === player && board[b] === player && board[c] === player) {
+    if (line.includes(lastMove) && line.every(cell => board[cell] === player)) {
       winningLines.push(line);
     }
   }
@@ -59,8 +101,17 @@ export const getEmptyCells = (board: CellValue[]): number[] => {
 };
 
 export const getCellType = (index: number): 'corner' | 'edge' | 'center' => {
-  if (index === 4) return 'center';
-  if ([0, 2, 6, 8].includes(index)) return 'corner';
+  // For 5x5 board (indices 0-24)
+  const row = Math.floor(index / 5);
+  const col = index % 5;
+  
+  // Center is position (2,2) = index 12
+  if (row === 2 && col === 2) return 'center';
+  
+  // Corners are (0,0), (0,4), (4,0), (4,4) = indices 0, 4, 20, 24
+  if ((row === 0 || row === 4) && (col === 0 || col === 4)) return 'corner';
+  
+  // Everything else is edge
   return 'edge';
 };
 

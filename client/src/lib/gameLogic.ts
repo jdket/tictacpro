@@ -25,11 +25,11 @@ export const getEmptyCells = (board: CellValue[]): number[] => {
 };
 
 export const getCellRow = (cellIndex: number): number => {
-  return Math.floor(cellIndex / 3);
+  return Math.floor(cellIndex / 5);
 };
 
 export const getCellColumn = (cellIndex: number): number => {
-  return cellIndex % 3;
+  return cellIndex % 5;
 };
 
 export const getAdjacentCells = (cellIndex: number): number[] => {
@@ -75,9 +75,9 @@ export const getAIMoveWithPreference = (
   
   if (emptyCells.length === 0) return null;
   
-  const corners = [0, 2, 6, 8];
-  const edges = [1, 3, 5, 7];
-  const center = [4];
+  const corners = [0, 4, 20, 24];
+  const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+  const center = [12];
   
   let preferredCells: number[] = [];
   
@@ -116,11 +116,10 @@ export const canPlayerWin = (board: CellValue[]): number | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    const [a, b, c] = line;
-    const values = [board[a], board[b], board[c]];
+    const values = line.map(i => board[i]);
     
-    // Check if player has 2 X's and one empty cell
-    if (values.filter(v => v === 'X').length === 2 && values.filter(v => v === null).length === 1) {
+    // Check if player has 3 X's and one empty cell (4-in-a-row)
+    if (values.filter(v => v === 'X').length === 3 && values.filter(v => v === null).length === 1) {
       return line.find(i => board[i] === null) || null;
     }
   }
@@ -132,11 +131,10 @@ export const canAIWin = (board: CellValue[]): number | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    const [a, b, c] = line;
-    const values = [board[a], board[b], board[c]];
+    const values = line.map(i => board[i]);
     
-    // Check if AI has 2 O's and one empty cell
-    if (values.filter(v => v === 'O').length === 2 && values.filter(v => v === null).length === 1) {
+    // Check if AI has 3 O's and one empty cell (4-in-a-row)
+    if (values.filter(v => v === 'O').length === 3 && values.filter(v => v === null).length === 1) {
       return line.find(i => board[i] === null) || null;
     }
   }
