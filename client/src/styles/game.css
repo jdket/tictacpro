@@ -417,7 +417,7 @@
   font-size: 3rem;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
   position: relative;
   border: 2px solid transparent;
 }
@@ -824,8 +824,8 @@
 }
 
 @keyframes abilityPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 /* Responsive Design */
