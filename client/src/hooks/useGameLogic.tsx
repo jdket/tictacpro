@@ -5,8 +5,12 @@ import { checkWinningLine, checkPlayerWinningLines, checkNewWinningLines, isBoar
 import { useEffects } from './useEffects';
 import { useObstacles } from './useObstacles';
 
-const getRandomEffect = (): Effect => {
-  const effectData = gameData.effects[Math.floor(Math.random() * gameData.effects.length)];
+const getRandomPositiveEffect = (): Effect => {
+  // Get only positive effects (scoring, placement, memory, economy, ai)
+  const positiveEffects = gameData.effects.filter(effect => 
+    ['scoring', 'placement', 'memory', 'economy', 'ai'].includes(effect.type)
+  );
+  const effectData = positiveEffects[Math.floor(Math.random() * positiveEffects.length)];
   return {
     ...effectData,
     type: effectData.type as EffectType
@@ -18,22 +22,16 @@ const getRandomObstacle = (): Obstacle => {
 };
 
 const getEffectsForLevel = (level: number): Effect[] => {
-  const numEffects = Math.min(1 + Math.floor(level / 2), 3); // 1-3 effects
-  const effects = [];
-  for (let i = 0; i < numEffects; i++) {
-    effects.push(getRandomEffect());
-  }
-  return effects;
+  // Always have exactly 1 positive effect per level
+  return [getRandomPositiveEffect()];
 };
 
 const getObstaclesForLevel = (level: number): Obstacle[] => {
-  if (level < 2) return [];
-  const numObstacles = level >= 5 ? Math.min(1 + Math.floor((level - 5) / 2), 2) : level % 2 === 0 ? 1 : 0;
-  const obstacles = [];
-  for (let i = 0; i < numObstacles; i++) {
-    obstacles.push(getRandomObstacle());
+  // Negative effects (obstacles) appear every 2 levels starting from level 2
+  if (level % 2 === 0) {
+    return [getRandomObstacle()];
   }
-  return obstacles;
+  return [];
 };
 
 const initialGameState: GameState = {

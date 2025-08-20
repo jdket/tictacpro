@@ -44,7 +44,7 @@ const TicTacPro: React.FC = () => {
           </div>
           <div className="effects-preview">
             {gameState.nextLevelEffects.map((effect, index) => (
-              <div key={index} className={`effect-preview ${effect.type === 'scoring' ? 'good-effect' : 'bad-effect'}`}>
+              <div key={index} className="effect-preview good-effect">
                 <h3>{effect.name}</h3>
                 <p>{effect.text}</p>
               </div>
