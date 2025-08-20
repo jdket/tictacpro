@@ -142,125 +142,121 @@ export const useGameLogic = () => {
   }, [gameState.currentLevel]);
 
   const makeMove = useCallback((cellIndex: number): boolean => {
-    if (gameState.phase !== 'playing' || gameState.board[cellIndex] !== null) {
-      return false;
-    }
-
-    // Check if move is valid based on obstacles and effects
-    if (!isValidMove(cellIndex)) {
-      return false;
-    }
-
-    const newBoard = [...gameState.board];
-    let finalCellIndex = cellIndex;
-
-    // Keep the original cell index for now
-    finalCellIndex = cellIndex;
-
-    newBoard[finalCellIndex] = 'X';
+    let moveSuccess = false;
     
-    const newMoveHistory = [...gameState.moveHistory, finalCellIndex];
-    const isCenter = finalCellIndex === 4;
-    
-    setGameState(prev => ({
-      ...prev,
-      board: newBoard,
-      moveHistory: newMoveHistory,
-      lastPlayerMove: finalCellIndex,
-      firstMoveWasCenter: prev.moveHistory.length === 0 && isCenter,
-      usedCenter: prev.usedCenter || isCenter
-    }));
+    setGameState(prev => {
+      // Validation
+      if (prev.phase !== 'playing' || prev.board[cellIndex] !== null) {
+        return prev;
+      }
 
-    // Check for winning line
-    const winningLine = checkWinningLine(newBoard);
-    if (winningLine) {
-      setGameState(prev => ({
+      console.log('Making player move at index:', cellIndex);
+      console.log('Current board before move:', prev.board);
+
+      const newBoard = [...prev.board];
+      newBoard[cellIndex] = 'X';
+      
+      console.log('Board after player move:', newBoard);
+      
+      const newMoveHistory = [...prev.moveHistory, cellIndex];
+      const isCenter = cellIndex === 4;
+      
+      // Check for winning line
+      const winningLine = checkWinningLine(newBoard);
+      
+      moveSuccess = true;
+      
+      return {
         ...prev,
-        winningLine,
-        score: prev.score + 1000 // 1000 points per line completed
-      }));
+        board: newBoard,
+        moveHistory: newMoveHistory,
+        lastPlayerMove: cellIndex,
+        firstMoveWasCenter: prev.moveHistory.length === 0 && isCenter,
+        usedCenter: prev.usedCenter || isCenter,
+        winningLine: winningLine || prev.winningLine,
+        score: winningLine ? prev.score + 1000 : prev.score
+      };
+    });
+
+    if (moveSuccess) {
+      // Schedule AI move after a short delay
+      setTimeout(() => {
+        makeAIMove();
+      }, 300);
     }
 
-    // Schedule AI move after a short delay
-    setTimeout(() => {
-      makeAIMove();
-    }, 300);
-
-    return true;
-  }, [gameState]);
+    return moveSuccess;
+  }, []);
 
   const makeAIMove = useCallback(() => {
-    let aiMoveIndex = getRandomEmptyCell(gameState.board, []);
-    
-    // Apply AI behavior based on effects
-    if (gameState.currentEffect && aiMoveIndex !== null) {
-      aiMoveIndex = applyAIBehavior(aiMoveIndex);
-    }
-
-    if (aiMoveIndex === null) return;
-
-    const newBoard = [...gameState.board];
-    newBoard[aiMoveIndex] = 'O';
-    
-    setGameState(prev => ({
-      ...prev,
-      board: newBoard,
-      lastAIMove: aiMoveIndex
-    }));
-
-    // Check if level is complete
-    checkLevelComplete(newBoard);
-  }, [gameState]);
-
-  const applyAIBehavior = useCallback((aiMoveIndex: number): number => {
-    if (!gameState.currentEffect) return aiMoveIndex;
-
-    const corners = [0, 2, 6, 8];
-    const edges = [1, 3, 5, 7];
-    const center = 4;
-
-    switch (gameState.currentEffect.id) {
-      case 'e031': // O Drift - prefers edges
-        const emptyEdges = edges.filter(edge => gameState.board[edge] === null);
-        return emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+    setGameState(prev => {
+      console.log('AI making move, board before AI move:', prev.board);
       
-      case 'e032': // O Corner Habit - prefers corners
-        const emptyCorners = corners.filter(corner => gameState.board[corner] === null);
-        return emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
+      let aiMoveIndex = getRandomEmptyCell(prev.board, []);
       
-      case 'e033': // O Avoid Center
-        return aiMoveIndex === center ? (getRandomEmptyCell(gameState.board, [center]) || aiMoveIndex) : aiMoveIndex;
-      
-      case 'e039': // O Center Rush
-        return gameState.board[center] === null ? center : aiMoveIndex;
-      
-      case 'e040': // O Edge Rush
-        if (gameState.lastAIMove === null) {
-          const emptyEdges = edges.filter(edge => gameState.board[edge] === null);
-          return emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+      // Apply AI behavior based on effects
+      if (prev.currentEffect && aiMoveIndex !== null) {
+        const corners = [0, 2, 6, 8];
+        const edges = [1, 3, 5, 7];
+        const center = 4;
+
+        switch (prev.currentEffect.id) {
+          case 'e031': // O Drift - prefers edges
+            const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+            aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+            break;
+          
+          case 'e032': // O Corner Habit - prefers corners
+            const emptyCorners = corners.filter(corner => prev.board[corner] === null);
+            aiMoveIndex = emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
+            break;
+          
+          case 'e033': // O Avoid Center
+            aiMoveIndex = aiMoveIndex === center ? (getRandomEmptyCell(prev.board, [center]) || aiMoveIndex) : aiMoveIndex;
+            break;
+          
+          case 'e039': // O Center Rush
+            aiMoveIndex = prev.board[center] === null ? center : aiMoveIndex;
+            break;
+          
+          case 'e040': // O Edge Rush
+            if (prev.lastAIMove === null) {
+              const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+              aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
+            }
+            break;
         }
-        return aiMoveIndex;
+      }
+
+      if (aiMoveIndex === null) return prev;
+
+      console.log('AI choosing cell:', aiMoveIndex);
       
-      default:
-        return aiMoveIndex;
-    }
-  }, [gameState]);
+      const newBoard = [...prev.board];
+      newBoard[aiMoveIndex] = 'O';
+      
+      console.log('Board after AI move:', newBoard);
+      
+      // Check if level is complete
+      const isComplete = isBoardFull(newBoard);
+      
+      return {
+        ...prev,
+        board: newBoard,
+        lastAIMove: aiMoveIndex,
+        phase: isComplete ? 'level_complete' : prev.phase
+      };
+    });
+  }, []);
+
+
 
   const isValidMove = useCallback((cellIndex: number): boolean => {
     // Basic validation - only check if cell is empty
     return gameState.board[cellIndex] === null;
   }, [gameState]);
 
-  const checkLevelComplete = useCallback((board: CellValue[]) => {
-    const isComplete = isBoardFull(board);
-    
-    if (isComplete) {
-      setGameState(prev => ({
-        ...prev,
-        phase: 'level_complete'
-      }));
-    }
-  }, []);
+
 
   const setGhostPreview = useCallback((cellIndex: number | null) => {
     setGameState(prev => ({
