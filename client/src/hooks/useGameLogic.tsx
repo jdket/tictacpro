@@ -1,35 +1,56 @@
 import { useState, useCallback, useEffect } from 'react';
-import { GameState, CellValue, Effect, Obstacle } from '../types/game';
+import { GameState, CellValue, Effect, Obstacle, EffectType } from '../types/game';
 import { gameData } from '../data/gameData';
 import { checkWinningLine, isBoardFull, getRandomEmptyCell } from '../utils/gameUtils';
 import { useEffects } from './useEffects';
 import { useObstacles } from './useObstacles';
 
 const getRandomEffect = (): Effect => {
-  return gameData.effects[Math.floor(Math.random() * gameData.effects.length)];
+  const effectData = gameData.effects[Math.floor(Math.random() * gameData.effects.length)];
+  return {
+    ...effectData,
+    type: effectData.type as EffectType
+  };
 };
 
 const getRandomObstacle = (): Obstacle => {
   return gameData.obstacles[Math.floor(Math.random() * gameData.obstacles.length)];
 };
 
+const getEffectsForLevel = (level: number): Effect[] => {
+  const numEffects = Math.min(1 + Math.floor(level / 2), 3); // 1-3 effects
+  const effects = [];
+  for (let i = 0; i < numEffects; i++) {
+    effects.push(getRandomEffect());
+  }
+  return effects;
+};
+
+const getObstaclesForLevel = (level: number): Obstacle[] => {
+  if (level < 2) return [];
+  const numObstacles = level >= 5 ? Math.min(1 + Math.floor((level - 5) / 2), 2) : level % 2 === 0 ? 1 : 0;
+  const obstacles = [];
+  for (let i = 0; i < numObstacles; i++) {
+    obstacles.push(getRandomObstacle());
+  }
+  return obstacles;
+};
+
 const initialGameState: GameState = {
   phase: 'menu',
   currentLevel: 1,
-  totalCoins: 0,
-  levelCoins: 0,
+  score: 0,
   board: Array(9).fill(null),
-  moveCount: 0,
-  linesCompleted: 0,
   currentEffect: null,
   currentObstacle: null,
+  nextLevelEffects: [],
+  nextLevelObstacles: [],
+  showLevelPreview: false,
   moveHistory: [],
   lastPlayerMove: null,
   lastAIMove: null,
   firstMoveWasCenter: false,
   usedCenter: false,
-  streakCount: 0,
-  comboCount: 0,
   winningLine: null,
   showingFlash: false,
   boardBlinking: false,
@@ -64,39 +85,61 @@ export const useGameLogic = () => {
   const { processObstacle, initializeObstacle } = useObstacles(gameState, setGameState);
 
   const startGame = useCallback(() => {
-    const newEffect = getRandomEffect();
-    const newObstacle = gameState.currentLevel >= 2 && gameState.currentLevel % 2 === 0 ? getRandomObstacle() : null;
+    // Show level preview before level 1 and after each level
+    if (gameState.currentLevel === 1 && !gameState.showLevelPreview) {
+      const effects = getEffectsForLevel(1);
+      const obstacles = getObstaclesForLevel(1);
+      
+      setGameState(prev => ({
+        ...prev,
+        nextLevelEffects: effects,
+        nextLevelObstacles: obstacles,
+        showLevelPreview: true
+      }));
+      return;
+    }
+
+    // Start actual gameplay
+    const effects = gameState.nextLevelEffects.length > 0 ? gameState.nextLevelEffects : getEffectsForLevel(gameState.currentLevel);
+    const obstacles = gameState.nextLevelObstacles.length > 0 ? gameState.nextLevelObstacles : getObstaclesForLevel(gameState.currentLevel);
     
     setGameState(prev => ({
       ...initialGameState,
       phase: 'playing',
       currentLevel: prev.currentLevel,
-      totalCoins: prev.totalCoins,
-      currentEffect: newEffect,
-      currentObstacle: newObstacle
+      score: prev.score,
+      currentEffect: effects[0] || null,
+      currentObstacle: obstacles[0] || null,
+      showLevelPreview: false,
+      nextLevelEffects: [],
+      nextLevelObstacles: []
     }));
     
     // Initialize effect and obstacle
     setTimeout(() => {
-      initializeEffect(newEffect);
-      if (newObstacle) {
-        initializeObstacle(newObstacle);
+      if (effects[0]) {
+        initializeEffect(effects[0]);
+      }
+      if (obstacles[0]) {
+        initializeObstacle(obstacles[0]);
       }
     }, 100);
-  }, [gameState.currentLevel, initializeEffect, initializeObstacle]);
+  }, [gameState.currentLevel, gameState.showLevelPreview, gameState.nextLevelEffects, gameState.nextLevelObstacles, initializeEffect, initializeObstacle]);
 
   const nextLevel = useCallback(() => {
+    const nextLevelNum = gameState.currentLevel + 1;
+    const effects = getEffectsForLevel(nextLevelNum);
+    const obstacles = getObstaclesForLevel(nextLevelNum);
+    
     setGameState(prev => ({
       ...prev,
-      currentLevel: prev.currentLevel + 1,
-      totalCoins: prev.totalCoins + prev.levelCoins,
-      phase: 'playing'
+      currentLevel: nextLevelNum,
+      phase: 'menu',
+      nextLevelEffects: effects,
+      nextLevelObstacles: obstacles,
+      showLevelPreview: true
     }));
-    
-    setTimeout(() => {
-      startGame();
-    }, 100);
-  }, [startGame]);
+  }, [gameState.currentLevel]);
 
   const makeMove = useCallback((cellIndex: number): boolean => {
     if (gameState.phase !== 'playing' || gameState.board[cellIndex] !== null) {
@@ -111,31 +154,21 @@ export const useGameLogic = () => {
     const newBoard = [...gameState.board];
     let finalCellIndex = cellIndex;
 
-    // Process obstacles that might modify the move
-    if (gameState.currentObstacle) {
-      finalCellIndex = processObstacle(cellIndex, 'player');
-    }
+    // Keep the original cell index for now
+    finalCellIndex = cellIndex;
 
     newBoard[finalCellIndex] = 'X';
     
     const newMoveHistory = [...gameState.moveHistory, finalCellIndex];
-    const isFirstMove = gameState.moveCount === 0;
     const isCenter = finalCellIndex === 4;
     
     setGameState(prev => ({
       ...prev,
       board: newBoard,
-      moveCount: prev.moveCount + 1,
       moveHistory: newMoveHistory,
       lastPlayerMove: finalCellIndex,
-      firstMoveWasCenter: isFirstMove && isCenter,
-      usedCenter: prev.usedCenter || isCenter,
-      effectState: {
-        ...prev.effectState,
-        trailX: finalCellIndex,
-        lastRowUsed: Math.floor(finalCellIndex / 3),
-        lastColumnUsed: finalCellIndex % 3,
-      }
+      firstMoveWasCenter: prev.moveHistory.length === 0 && isCenter,
+      usedCenter: prev.usedCenter || isCenter
     }));
 
     // Check for winning line
@@ -144,36 +177,20 @@ export const useGameLogic = () => {
       setGameState(prev => ({
         ...prev,
         winningLine,
-        linesCompleted: prev.linesCompleted + 1
+        score: prev.score + 1000 // 1000 points per line completed
       }));
-      
-      // Process scoring effects
-      if (gameState.currentEffect) {
-        const coins = processEffect(finalCellIndex, winningLine);
-        setGameState(prev => ({
-          ...prev,
-          levelCoins: prev.levelCoins + coins
-        }));
-      }
     }
 
-    // Schedule AI move if not skipped
-    if (!gameState.effectState.skipAIUsed || gameState.currentEffect?.id !== 'e019') {
-      setTimeout(() => {
-        makeAIMove();
-      }, gameState.currentEffect?.id === 'e034' ? 500 : 300);
-    }
+    // Schedule AI move after a short delay
+    setTimeout(() => {
+      makeAIMove();
+    }, 300);
 
     return true;
-  }, [gameState, processObstacle, processEffect]);
+  }, [gameState]);
 
   const makeAIMove = useCallback(() => {
-    const blockedCells = [
-      ...gameState.effectState.blockedCells,
-      ...gameState.effectState.windBlocked
-    ];
-    
-    let aiMoveIndex = getRandomEmptyCell(gameState.board, blockedCells);
+    let aiMoveIndex = getRandomEmptyCell(gameState.board, []);
     
     // Apply AI behavior based on effects
     if (gameState.currentEffect && aiMoveIndex !== null) {
@@ -188,25 +205,15 @@ export const useGameLogic = () => {
     setGameState(prev => ({
       ...prev,
       board: newBoard,
-      lastAIMove: aiMoveIndex,
-      effectState: {
-        ...prev.effectState,
-        trailX: null, // Clear trail after AI move
-      }
+      lastAIMove: aiMoveIndex
     }));
-
-    // Process post-AI obstacles
-    if (gameState.currentObstacle) {
-      processObstacle(aiMoveIndex, 'ai');
-    }
 
     // Check if level is complete
     checkLevelComplete(newBoard);
-  }, [gameState, processObstacle]);
+  }, [gameState]);
 
   const applyAIBehavior = useCallback((aiMoveIndex: number): number => {
-    const emptyCells = getRandomEmptyCell(gameState.board, gameState.effectState.blockedCells);
-    if (!gameState.currentEffect || emptyCells === null) return aiMoveIndex;
+    if (!gameState.currentEffect) return aiMoveIndex;
 
     const corners = [0, 2, 6, 8];
     const edges = [1, 3, 5, 7];
@@ -222,10 +229,10 @@ export const useGameLogic = () => {
         return emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
       
       case 'e033': // O Avoid Center
-        return aiMoveIndex === center ? emptyCells : aiMoveIndex;
+        return aiMoveIndex === center ? (getRandomEmptyCell(gameState.board, [center]) || aiMoveIndex) : aiMoveIndex;
       
       case 'e039': // O Center Rush
-        return gameState.board[center] === null && gameState.moveCount <= 2 ? center : aiMoveIndex;
+        return gameState.board[center] === null ? center : aiMoveIndex;
       
       case 'e040': // O Edge Rush
         if (gameState.lastAIMove === null) {
@@ -240,51 +247,20 @@ export const useGameLogic = () => {
   }, [gameState]);
 
   const isValidMove = useCallback((cellIndex: number): boolean => {
-    // Basic validation
-    if (gameState.board[cellIndex] !== null) return false;
-    if (gameState.effectState.blockedCells.includes(cellIndex)) return false;
-    if (gameState.effectState.frozenCells.includes(cellIndex)) return false;
-    
-    // Row/column repeat validation for obstacles
-    const row = Math.floor(cellIndex / 3);
-    const col = cellIndex % 3;
-    
-    if (gameState.effectState.lastRowUsed === row && gameState.currentObstacle?.id === 'o009') return false;
-    if (gameState.effectState.lastColumnUsed === col && gameState.currentObstacle?.id === 'o010') return false;
-    
-    // Effect-specific validations
-    if (gameState.currentEffect?.id === 'e017' && gameState.moveCount === 0) {
-      // Edge Magnet - first move must be edge
-      if (![1, 3, 5, 7].includes(cellIndex)) return false;
-    }
-    
-    if (gameState.currentEffect?.id === 'e018' && gameState.moveCount === 0) {
-      // Corner Magnet - first move must be corner
-      if (![0, 2, 6, 8].includes(cellIndex)) return false;
-    }
-    
-    return true;
+    // Basic validation - only check if cell is empty
+    return gameState.board[cellIndex] === null;
   }, [gameState]);
 
   const checkLevelComplete = useCallback((board: CellValue[]) => {
-    const isComplete = isBoardFull(board) || gameState.linesCompleted >= 3;
+    const isComplete = isBoardFull(board);
     
     if (isComplete) {
-      // Apply end-of-level effects
-      let finalCoins = gameState.levelCoins;
-      
-      if (gameState.currentEffect) {
-        const endBonus = processEffect(-1, null, 'level_end');
-        finalCoins += endBonus;
-      }
-      
       setGameState(prev => ({
         ...prev,
-        phase: 'level_complete',
-        levelCoins: finalCoins
+        phase: 'level_complete'
       }));
     }
-  }, [gameState, processEffect]);
+  }, []);
 
   const setGhostPreview = useCallback((cellIndex: number | null) => {
     setGameState(prev => ({
@@ -294,57 +270,9 @@ export const useGameLogic = () => {
   }, []);
 
   const useSpecialAbility = useCallback((abilityType: string, cellIndex?: number) => {
-    if (!gameState.currentEffect) return false;
-
-    switch (abilityType) {
-      case 'safe_retry':
-        if (gameState.currentEffect.id === 'e012' && !gameState.effectState.safeRetryUsed && gameState.lastPlayerMove !== null) {
-          const newBoard = [...gameState.board];
-          newBoard[gameState.lastPlayerMove] = null;
-          setGameState(prev => ({
-            ...prev,
-            board: newBoard,
-            effectState: { ...prev.effectState, safeRetryUsed: true }
-          }));
-          return true;
-        }
-        break;
-      
-      case 'cross_swap':
-        if (gameState.currentEffect.id === 'e014' && !gameState.effectState.crossSwapUsed && cellIndex !== undefined) {
-          // Implementation for moving existing X to empty cell
-          return true;
-        }
-        break;
-      
-      case 'skip_ai':
-        if (gameState.currentEffect.id === 'e019' && !gameState.effectState.skipAIUsed) {
-          setGameState(prev => ({
-            ...prev,
-            effectState: { ...prev.effectState, skipAIUsed: true }
-          }));
-          return true;
-        }
-        break;
-      
-      case 'recall':
-        if (gameState.currentEffect.id === 'e020' && !gameState.effectState.recallUsed && cellIndex !== undefined) {
-          const newBoard = [...gameState.board];
-          if (newBoard[cellIndex] === 'O') {
-            newBoard[cellIndex] = null;
-            setGameState(prev => ({
-              ...prev,
-              board: newBoard,
-              effectState: { ...prev.effectState, recallUsed: true }
-            }));
-            return true;
-          }
-        }
-        break;
-    }
-    
+    // Special abilities functionality removed for simplicity
     return false;
-  }, [gameState]);
+  }, []);
 
   return {
     gameState,

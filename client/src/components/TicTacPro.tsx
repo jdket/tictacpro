@@ -1,9 +1,6 @@
 import React from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import GameBoard from './GameBoard';
-import GameUI from './GameUI';
-import EffectDisplay from './EffectDisplay';
-import ObstacleDisplay from './ObstacleDisplay';
 import ScoreDisplay from './ScoreDisplay';
 import LevelDisplay from './LevelDisplay';
 
@@ -24,22 +21,12 @@ const TicTacPro: React.FC = () => {
   };
 
   const handleCellHover = (cellIndex: number | null) => {
-    if (gameState.currentEffect?.id === 'e013') { // Ghost Peek
-      setGhostPreview(cellIndex);
-    }
+    setGhostPreview(cellIndex);
   };
 
   return (
     <div className="tic-tac-pro">
-      <div className="game-header">
-        <LevelDisplay level={gameState.currentLevel} />
-        <ScoreDisplay 
-          totalCoins={gameState.totalCoins} 
-          levelCoins={gameState.levelCoins} 
-        />
-      </div>
-
-      {gameState.phase === 'menu' && (
+      {gameState.phase === 'menu' && !gameState.showLevelPreview && (
         <div className="menu-screen">
           <h1>TicTacPro</h1>
           <p>Enhanced Tic-Tac-Toe with 50 Effects & 20 Obstacles</p>
@@ -49,15 +36,37 @@ const TicTacPro: React.FC = () => {
         </div>
       )}
 
+      {gameState.phase === 'menu' && gameState.showLevelPreview && (
+        <div className="level-preview-screen">
+          <h2>NEXT ROUND</h2>
+          <div className="level-info">
+            <LevelDisplay level={gameState.currentLevel} />
+          </div>
+          <div className="effects-preview">
+            {gameState.nextLevelEffects.map((effect, index) => (
+              <div key={index} className={`effect-preview ${effect.type === 'scoring' ? 'good-effect' : 'bad-effect'}`}>
+                <h3>{effect.name}</h3>
+                <p>{effect.text}</p>
+              </div>
+            ))}
+            {gameState.nextLevelObstacles.map((obstacle, index) => (
+              <div key={index} className="effect-preview bad-effect">
+                <h3>{obstacle.name}</h3>
+                <p>{obstacle.text}</p>
+              </div>
+            ))}
+          </div>
+          <button onClick={startGame} className="start-button">
+            Start Level
+          </button>
+        </div>
+      )}
+
       {gameState.phase === 'playing' && (
         <div className="game-area">
-          <div className="effects-panel">
-            {gameState.currentEffect && (
-              <EffectDisplay effect={gameState.currentEffect} />
-            )}
-            {gameState.currentObstacle && (
-              <ObstacleDisplay obstacle={gameState.currentObstacle} />
-            )}
+          <div className="game-header">
+            <LevelDisplay level={gameState.currentLevel} />
+            <ScoreDisplay score={gameState.score} />
           </div>
 
           <GameBoard
@@ -70,19 +79,13 @@ const TicTacPro: React.FC = () => {
             showingFlash={gameState.showingFlash}
             boardBlinking={gameState.boardBlinking}
           />
-
-          <GameUI
-            gameState={gameState}
-            useSpecialAbility={useSpecialAbility}
-          />
         </div>
       )}
 
       {gameState.phase === 'level_complete' && (
         <div className="level-complete-screen">
           <h2>Level {gameState.currentLevel} Complete!</h2>
-          <p>Coins earned: {gameState.levelCoins}</p>
-          <p>Total coins: {gameState.totalCoins + gameState.levelCoins}</p>
+          <p>Score: {gameState.score}</p>
           {gameState.currentLevel < 10 ? (
             <button onClick={nextLevel} className="next-level-button">
               Next Level
@@ -90,7 +93,7 @@ const TicTacPro: React.FC = () => {
           ) : (
             <div className="game-complete">
               <h2>Game Complete!</h2>
-              <p>Final Score: {gameState.totalCoins + gameState.levelCoins} coins</p>
+              <p>Final Score: {gameState.score}</p>
               <button onClick={startGame} className="restart-button">
                 Play Again
               </button>

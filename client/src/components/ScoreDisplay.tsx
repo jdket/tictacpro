@@ -1,20 +1,15 @@
 import React from 'react';
 
 interface ScoreDisplayProps {
-  totalCoins: number;
-  levelCoins: number;
+  score: number;
 }
 
-const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ totalCoins, levelCoins }) => {
+const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ score }) => {
   return (
     <div className="score-display">
       <div className="score-section">
-        <span className="score-label">Total Coins</span>
-        <span className="score-value total-coins">{totalCoins}</span>
-      </div>
-      <div className="score-section">
-        <span className="score-label">Level Coins</span>
-        <span className="score-value level-coins">+{levelCoins}</span>
+        <span className="score-label">Score</span>
+        <span className="score-value">{score}</span>
       </div>
     </div>
   );
