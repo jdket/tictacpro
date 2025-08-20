@@ -143,10 +143,19 @@ export const useGameLogic = () => {
 
   const makeAIMove = useCallback(() => {
     setGameState(prev => {
+      // Don't make AI move if level is already complete
+      if (prev.phase === 'level_complete') {
+        console.log('Level complete, skipping AI move');
+        return prev;
+      }
+
       console.log('AI making move, board before AI move:', prev.board);
       
       const emptyCells = getEmptyCells(prev.board);
-      if (emptyCells.length === 0) return prev;
+      if (emptyCells.length === 0) {
+        console.log('No empty cells, level complete');
+        return { ...prev, phase: 'level_complete' };
+      }
       
       let aiMoveIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
       
@@ -227,6 +236,10 @@ export const useGameLogic = () => {
       // Check for winning line
       const winningLine = checkWinningLine(newBoard);
       
+      // Check if board is complete after player move
+      const isComplete = isBoardFull(newBoard);
+      console.log('Board complete after player move:', isComplete);
+      
       return {
         ...prev,
         board: newBoard,
@@ -235,17 +248,28 @@ export const useGameLogic = () => {
         firstMoveWasCenter: prev.moveHistory.length === 0 && isCenter,
         usedCenter: prev.usedCenter || isCenter,
         winningLine: winningLine || prev.winningLine,
-        score: winningLine ? prev.score + 1000 : prev.score
+        score: winningLine ? prev.score + 1000 : prev.score,
+        phase: isComplete ? 'level_complete' : prev.phase
       };
     });
 
-    // Schedule AI move after a short delay
+    // Only schedule AI move if board isn't full
     setTimeout(() => {
-      makeAIMove();
+      setGameState(prev => {
+        if (prev.phase === 'level_complete') {
+          console.log('Level already complete, skipping AI move');
+          return prev;
+        }
+        return prev;
+      });
+      
+      if (gameState.phase !== 'level_complete') {
+        makeAIMove();
+      }
     }, 300);
 
     return true;
-  }, [makeAIMove]);
+  }, [makeAIMove, gameState.phase]);
 
 
 
