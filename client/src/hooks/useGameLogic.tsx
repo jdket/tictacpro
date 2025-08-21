@@ -201,6 +201,29 @@ export const useGameLogic = () => {
       
       console.log('Board after AI move:', newBoard);
       
+      // Check for NEW AI O winning lines created by this move only
+      const newWinningLines = checkNewWinningLines(newBoard, 'O', aiMoveIndex);
+      const lineCount = newWinningLines.length;
+      
+      let opponentScoreIncrease = 0;
+      let newWinningLine = prev.winningLine;
+      
+      if (lineCount > 0) {
+        // Base points: 1000 per line (same as player)
+        opponentScoreIncrease = lineCount * 1000;
+        
+        // Bonus for multiple lines: 500 extra points (same as player)
+        if (lineCount >= 2) {
+          opponentScoreIncrease += 500;
+          console.log(`AI created ${lineCount} lines! Bonus awarded!`);
+        }
+        
+        // Use the first winning line for display (or keep existing if we already had one)
+        newWinningLine = newWinningLines[0];
+        
+        console.log(`AI scored ${opponentScoreIncrease} points for ${lineCount} NEW line(s)`);
+      }
+      
       // Check if level is complete
       const isComplete = isBoardFull(newBoard);
       
@@ -210,6 +233,8 @@ export const useGameLogic = () => {
         ...prev,
         board: newBoard,
         lastAIMove: aiMoveIndex,
+        winningLine: newWinningLine,
+        opponentScore: prev.opponentScore + opponentScoreIncrease,
         phase: isComplete ? 'level_complete' : prev.phase
       };
     });
