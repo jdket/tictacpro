@@ -107,6 +107,21 @@ const TicTacPro: React.FC = () => {
               <span className="score-value">{gameState.opponentScore.toLocaleString()}</span>
             </div>
           </div>
+          
+          <div className="current-level-effects">
+            {gameState.currentEffect && (
+              <div className="current-effect good-effect">
+                <h3>{gameState.currentEffect.name}</h3>
+                <p>{gameState.currentEffect.text}</p>
+              </div>
+            )}
+            {gameState.currentObstacle && (
+              <div className="current-obstacle bad-effect">
+                <h3>{gameState.currentObstacle.name}</h3>
+                <p>{gameState.currentObstacle.text}</p>
+              </div>
+            )}
+          </div>
           {gameState.currentLevel < 10 ? (
             <button onClick={nextLevel} className="next-level-button">
               Next Level
