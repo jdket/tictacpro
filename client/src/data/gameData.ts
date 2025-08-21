@@ -9,7 +9,7 @@ export const gameData = {
     { "id":"e006","name":"Row Runner","type":"scoring","text":"Any horizontal scoring line gives +2000 pts","value":2000 },
     { "id":"e007","name":"Column Climber","type":"scoring","text":"Any vertical scoring line gives +2000 pts","value":2000 },
     { "id":"e008","name":"Triple Cherry","type":"scoring","text":"If you score 3+ lines this level, +3000 at end","value":3000 },
-    { "id":"e009","name":"Quick Start","type":"scoring","text":"Your first move is center, +2000 pts","value":2000 },
+    { "id":"e009","name":"Quick Start","type":"scoring","text":"First move on center tile gives +2000 pts","value":2000 },
     { "id":"e010","name":"Fast Corner","type":"scoring","text":"Corner placement that completes scoring line gives +1000 pts","value":1000 },
     { "id":"e011","name":"Line Streak","type":"scoring","text":"Scoring on two consecutive turns gives +2000 pts","value":2000 },
     { "id":"e012","name":"Middle Master","type":"scoring","text":"Scoring line fully on middle row or column gives +2000 pts","value":2000 },
