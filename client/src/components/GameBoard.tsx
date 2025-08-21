@@ -43,19 +43,28 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
 
   const getCellContent = (index: number): string => {
-    // If cell is dimmed and has content, show question mark instead
+    // If cell is dimmed and has content, hide the actual content (overlay will show ?)
     if (effectState.dimmedCells.includes(index) && board[index]) {
-      return '?';
+      return '';
     }
     return board[index] || '';
   };
 
   const getCellStyle = (index: number): React.CSSProperties => {
-    // Purple question marks for dimmed cells with content
-    if (effectState.dimmedCells.includes(index) && board[index]) {
-      return { color: '#8b5cf6', fontWeight: 'bold' };
-    }
+    // No inline style needed, handled by CSS now
     return {};
+  };
+
+  const getCellOverlay = (index: number): JSX.Element | null => {
+    // Show question mark overlay for dimmed cells with content
+    if (effectState.dimmedCells.includes(index) && board[index]) {
+      return (
+        <div className="question-mark-overlay">
+          ?
+        </div>
+      );
+    }
+    return null;
   };
 
   const isCellClickable = (index: number): boolean => {
@@ -73,6 +82,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           style={getCellStyle(index)}
         >
           {getCellContent(index)}
+          {getCellOverlay(index)}
         </div>
       ))}
     </div>

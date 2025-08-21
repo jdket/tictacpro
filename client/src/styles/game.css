@@ -442,11 +442,29 @@
   background: rgba(128, 128, 128, 0.3) !important;
   color: #888 !important;
   border-color: #666 !important;
+  position: relative;
 }
 
 .cell-dimmed:has-content {
   color: #8b5cf6 !important;
   font-weight: bold;
+}
+
+.question-mark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(139, 92, 246, 0.9);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 1;
+  border-radius: inherit;
 }
 
 /* Dual Score Display */
