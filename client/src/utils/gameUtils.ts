@@ -83,7 +83,17 @@ export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', last
   for (const line of lines) {
     // Only check lines that include the cell that was just played
     if (line.includes(lastMove) && line.every(cell => board[cell] === player)) {
-      winningLines.push(line);
+      // Check if this line was already complete before the last move
+      // Create a board state without the last move
+      const boardBefore = [...board];
+      boardBefore[lastMove] = null;
+      
+      // If the line was already complete before this move, don't count it as new
+      const wasAlreadyComplete = line.every(cell => cell === lastMove || boardBefore[cell] === player);
+      
+      if (!wasAlreadyComplete) {
+        winningLines.push(line);
+      }
     }
   }
   
