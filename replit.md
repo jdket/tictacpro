@@ -1,6 +1,6 @@
 # Overview
 
-TicTacPro is an enhanced Tic-Tac-Toe game built with React, TypeScript, and Express.js. It features 50 different effects and 20 obstacles that modify gameplay mechanics across 10 progressive levels. The game includes advanced visual effects using Three.js, modern UI components with Radix UI, and a comprehensive game state management system. Players earn coins by completing lines, with various effects modifying scoring, placement rules, AI behavior, memory challenges, and economic mechanics.
+TicTacPro is an enhanced Tic-Tac-Toe game built with React, TypeScript, and Express.js. It features 24 refined effects and 9 obstacles that modify gameplay mechanics across 10 progressive levels. The game uses a simplified, child-friendly design with static boards, dimmed tiles showing question marks, and wild cells that count for both players. Players earn points by completing 4-in-a-row lines on a 5x5 board, with effects providing scoring bonuses and obstacles applying penalties or opponent benefits.
 
 # User Preferences
 
@@ -25,11 +25,12 @@ Preferred communication style: Simple, everyday language.
 - **Development/production** environment handling with Vite integration
 
 ## Game Logic Architecture
-- **State management** using React hooks with complex game state tracking
-- **Effect system** with 50+ different gameplay modifiers categorized by type (scoring, placement, memory, AI, economy)
-- **Obstacle system** with 20+ gameplay challenges that modify board behavior
-- **AI system** with configurable behavior patterns affected by obstacles and effects
-- **Level progression** system with increasing difficulty and coin-based scoring
+- **State management** using React hooks with simplified game state tracking
+- **Effect system** with 24 refined gameplay modifiers categorized by type (scoring, memory, wild)
+- **Obstacle system** with 9 penalty-based challenges that apply taxes and opponent benefits
+- **AI system** with basic behavior patterns
+- **Level progression** system with increasing difficulty and point-based scoring
+- **Child-friendly design** with static boards, dimmed tiles, and wild cells
 
 ## Data Storage Solutions
 - **Drizzle ORM** configured for PostgreSQL with migrations support

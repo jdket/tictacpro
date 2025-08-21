@@ -36,7 +36,7 @@ const TicTacPro: React.FC = () => {
       {gameState.phase === 'menu' && !gameState.showLevelPreview && (
         <div className="menu-screen">
           <h1>TicTacPro</h1>
-          <p>Enhanced Tic-Tac-Toe with 50 Effects & 20 Obstacles</p>
+          <p>A new approach to a classic game with over 30 random effects</p>
           <button onClick={startGame} className="start-button">
             Start Game
           </button>
