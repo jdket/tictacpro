@@ -11,6 +11,7 @@ const getRandomPositiveEffect = (): Effect => {
     ['scoring', 'memory', 'wild'].includes(effect.type)
   );
   const effectData = positiveEffects[Math.floor(Math.random() * positiveEffects.length)];
+  console.log('Selected random effect:', effectData.name, 'type:', effectData.type);
   return {
     ...effectData,
     type: effectData.type as EffectType
@@ -22,6 +23,16 @@ const getRandomObstacle = (): Obstacle => {
 };
 
 const getEffectsForLevel = (level: number): Effect[] => {
+  // For testing wild cells, force a wild effect for level 1
+  if (level === 1) {
+    const wildEffects = gameData.effects.filter(effect => effect.type === 'wild');
+    const selectedWild = wildEffects[Math.floor(Math.random() * wildEffects.length)];
+    console.log('Forcing wild effect for testing:', selectedWild.name);
+    return [{
+      ...selectedWild,
+      type: selectedWild.type as EffectType
+    }];
+  }
   // Always have exactly 1 positive effect per level
   return [getRandomPositiveEffect()];
 };
@@ -122,9 +133,11 @@ export const useGameLogic = () => {
     // Initialize effect and obstacle
     setTimeout(() => {
       if (effects[0]) {
+        console.log('Initializing effect:', effects[0].name, effects[0].type);
         initializeEffect(effects[0]);
       }
       if (obstacles[0]) {
+        console.log('Initializing obstacle:', obstacles[0].name);
         initializeObstacle(obstacles[0]);
       }
     }, 100);
@@ -263,8 +276,10 @@ export const useGameLogic = () => {
       const isCenter = cellIndex === 12;
       
       // Check for NEW player X winning lines created by this move only
+      console.log('Checking for X lines with wild cells:', gameState.effectState.wildCells);
       const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex, gameState.effectState.wildCells);
       const lineCount = newWinningLines.length;
+      console.log('Found', lineCount, 'new player lines:', newWinningLines);
       
       let scoreIncrease = 0;
       let newWinningLine = prev.winningLine;
