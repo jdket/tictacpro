@@ -583,6 +583,44 @@
   border-radius: 10px;
 }
 
+/* Active Effects During Gameplay */
+.active-effects {
+  margin-top: 20px;
+  width: 180px;
+}
+
+.active-effect, .active-obstacle {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.active-effect {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: white;
+  border: 2px solid #16a34a;
+}
+
+.active-obstacle {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  color: white;
+  border: 2px solid #dc2626;
+}
+
+.active-effect h4, .active-obstacle h4 {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.active-effect p, .active-obstacle p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
 /* Level Complete Screen Scores */
 .level-complete-scores,
 .final-scores {

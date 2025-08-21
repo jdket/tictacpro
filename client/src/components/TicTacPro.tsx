@@ -67,6 +67,20 @@ const TicTacPro: React.FC = () => {
           <div className="game-layout">
             <div className="level-section">
               <LevelDisplay level={gameState.currentLevel} />
+              <div className="active-effects">
+                {gameState.currentEffect && (
+                  <div className="active-effect good-effect">
+                    <h4>{gameState.currentEffect.name}</h4>
+                    <p>{gameState.currentEffect.text}</p>
+                  </div>
+                )}
+                {gameState.currentObstacle && (
+                  <div className="active-obstacle bad-effect">
+                    <h4>{gameState.currentObstacle.name}</h4>
+                    <p>{gameState.currentObstacle.text}</p>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="score-section">
