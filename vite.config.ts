@@ -21,10 +21,18 @@ export default defineConfig({
     },
   },
   root: path.resolve(__dirname, "client"),
+  server: {
+    port: Number(process.env.PORT) || 3000,
+    host: true
+  },
+  preview: {
+    port: Number(process.env.PORT) || 3000,
+    host: true
+  },
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
   // Add support for large models and audio files
-  assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.mp3", "**/*.ogg", "**/*.wav"],
+  assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.mp3", "**/*.ogg", "**/*.wav"]
 });
