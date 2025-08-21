@@ -233,99 +233,128 @@ export const useNewEffects = (
     switch (effect.id) {
       // MEMORY EFFECTS - Set up dimmed cells
       case 'e017': // Memory Challenge - Dim 5 tiles
-        const randomCells5 = getRandomCells(5, undefined, true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: randomCells5
-          }
-        }));
-        console.log(`Memory Challenge: Dimmed cells at positions ${randomCells5.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const randomCells5 = getRandomCells(5, undefined, true, existingCells);
+          console.log(`Memory Challenge: Dimmed cells at positions ${randomCells5.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...randomCells5]
+            }
+          };
+        });
         break;
       
       case 'e018': // Corner Memory - Dim all 4 corners
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: [0, 4, 20, 24]
-          }
-        }));
-        console.log('Corner Memory: Dimmed all 4 corners');
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const corners = [0, 4, 20, 24];
+          const availableCorners = corners.filter(corner => !existingCells.includes(corner));
+          console.log(`Corner Memory: Dimmed corner cells at positions ${availableCorners.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...availableCorners]
+            }
+          };
+        });
         break;
       
       case 'e019': // Edge Memory - Dim 4 edges
-        const randomEdges = getRandomCells(4, [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23], true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: randomEdges
-          }
-        }));
-        console.log(`Edge Memory: Dimmed edge cells at positions ${randomEdges.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+          const randomEdges = getRandomCells(4, edges, true, existingCells);
+          console.log(`Edge Memory: Dimmed edge cells at positions ${randomEdges.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...randomEdges]
+            }
+          };
+        });
         break;
       
       // WILD EFFECTS - Set up wild cells
       case 'e020': // Wild Favor - 5 tiles become Wild
-        const wildCells5 = getRandomCells(5, undefined, true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells5
-          }
-        }));
-        console.log(`Wild Favor: Wild cells at positions ${wildCells5.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const wildCells5 = getRandomCells(5, undefined, true, existingCells);
+          console.log(`Wild Favor: Wild cells at positions ${wildCells5.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells5]
+            }
+          };
+        });
         break;
       
       case 'e021': // Wild Corners - 2 corners become Wild
-        const wildCorners = getRandomCells(2, [0, 4, 20, 24], false); // Corners are far apart
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCorners
-          }
-        }));
-        console.log(`Wild Corners: Wild corner cells at positions ${wildCorners.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const cornerPool = [0, 4, 20, 24];
+          const wildCorners = getRandomCells(2, cornerPool, false, existingCells); // Corners are far apart
+          console.log(`Wild Corners: Wild corner cells at positions ${wildCorners.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCorners]
+            }
+          };
+        });
         break;
       
       case 'e022': // Wild Edges - 3 edges become Wild
-        const wildEdges = getRandomCells(3, [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23], true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildEdges
-          }
-        }));
-        console.log(`Wild Edges: Wild edge cells at positions ${wildEdges.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const edgePool = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+          const wildEdges = getRandomCells(3, edgePool, true, existingCells);
+          console.log(`Wild Edges: Wild edge cells at positions ${wildEdges.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildEdges]
+            }
+          };
+        });
         break;
       
       case 'e023': // Wild Collector - 3 tiles become Wild
-        const wildCells3 = getRandomCells(3, undefined, true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells3
-          }
-        }));
-        console.log(`Wild Collector: Wild cells at positions ${wildCells3.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const wildCells3 = getRandomCells(3, undefined, true, existingCells);
+          console.log(`Wild Collector: Wild cells at positions ${wildCells3.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells3]
+            }
+          };
+        });
         break;
       
       case 'e024': // Wild Saver - 2 tiles become Wild
-        const wildCells2 = getRandomCells(2, undefined, true); // Avoid adjacent
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells2
-          }
-        }));
-        console.log(`Wild Saver: Wild cells at positions ${wildCells2.join(', ')}`);
+        setGameState(prev => {
+          const existingCells = [...prev.effectState.dimmedCells, ...prev.effectState.wildCells];
+          const wildCells2 = getRandomCells(2, undefined, true, existingCells);
+          console.log(`Wild Saver: Wild cells at positions ${wildCells2.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells2]
+            }
+          };
+        });
         break;
     }
   }, [setGameState]);
@@ -334,19 +363,22 @@ export const useNewEffects = (
 };
 
 // Helper functions
-const getRandomCells = (count: number, pool?: number[], avoidAdjacent?: boolean): number[] => {
+const getRandomCells = (count: number, pool?: number[], avoidAdjacent?: boolean, existingCells?: number[]): number[] => {
   const availableCells = pool || Array.from({ length: 25 }, (_, i) => i);
   const selected: number[] = [];
+  const allExistingCells = [...(existingCells || [])];
   
   while (selected.length < count && selected.length < availableCells.length) {
     const randomIndex = Math.floor(Math.random() * availableCells.length);
     const cell = availableCells[randomIndex];
     
-    if (!selected.includes(cell)) {
+    if (!selected.includes(cell) && !allExistingCells.includes(cell)) {
       // Check if we need to avoid adjacent cells
-      if (avoidAdjacent && selected.length > 0) {
-        const isAdjacent = selected.some(selectedCell => areAdjacent(cell, selectedCell));
-        if (!isAdjacent) {
+      if (avoidAdjacent && (selected.length > 0 || allExistingCells.length > 0)) {
+        const adjacentToSelected = selected.some(selectedCell => areAdjacent(cell, selectedCell));
+        const adjacentToExisting = allExistingCells.some(existingCell => areAdjacent(cell, existingCell));
+        
+        if (!adjacentToSelected && !adjacentToExisting) {
           selected.push(cell);
         }
       } else {
