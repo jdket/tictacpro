@@ -5,7 +5,7 @@ import { useAudio } from '../lib/stores/useAudio';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
-import { VolumeX, Volume2 } from 'lucide-react';
+import { VolumeX, Volume2, Music } from 'lucide-react';
 
 const TicTacPro: React.FC = () => {
   const {
@@ -17,7 +17,7 @@ const TicTacPro: React.FC = () => {
     useSpecialAbility
   } = useGameLogic();
   
-  const { setClickSound, isMuted, toggleMute } = useAudio();
+  const { setClickSound, setBackgroundMusic, isMuted, isMusicMuted, toggleMute, toggleMusicMute, playMusic } = useAudio();
 
   const handleCellClick = (cellIndex: number) => {
     if (gameState.phase === 'playing') {
@@ -38,18 +38,36 @@ const TicTacPro: React.FC = () => {
     const clickAudio = new Audio('/sounds/click.mp3');
     clickAudio.volume = 0.5;
     setClickSound(clickAudio);
-  }, [setClickSound]);
+
+    // Load background music
+    const musicAudio = new Audio('/sounds/soundtrack.mp3');
+    musicAudio.loop = true;
+    musicAudio.volume = 0.3;
+    setBackgroundMusic(musicAudio);
+    
+    // Start playing music after a short delay
+    setTimeout(() => {
+      playMusic();
+    }, 1000);
+  }, [setClickSound, setBackgroundMusic, playMusic]);
 
   return (
     <div className="tic-tac-pro">
-      {/* Sound button - always visible in upper right */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Sound buttons - always visible in upper right */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
         <button
           onClick={toggleMute}
           className="bg-white/90 hover:bg-white border border-gray-300 rounded-lg p-2 shadow-lg transition-colors"
-          title={isMuted ? "Unmute" : "Mute"}
+          title={isMuted ? "Unmute Sound Effects" : "Mute Sound Effects"}
         >
           {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
+        <button
+          onClick={toggleMusicMute}
+          className="bg-white/90 hover:bg-white border border-gray-300 rounded-lg p-2 shadow-lg transition-colors"
+          title={isMusicMuted ? "Unmute Music" : "Mute Music"}
+        >
+          {isMusicMuted ? <VolumeX size={20} /> : <Music size={20} />}
         </button>
       </div>
       {gameState.phase === 'menu' && !gameState.showLevelPreview && (

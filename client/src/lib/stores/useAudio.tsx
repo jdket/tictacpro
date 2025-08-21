@@ -6,6 +6,7 @@ interface AudioState {
   successSound: HTMLAudioElement | null;
   clickSound: HTMLAudioElement | null;
   isMuted: boolean;
+  isMusicMuted: boolean;
   
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
@@ -15,9 +16,12 @@ interface AudioState {
   
   // Control functions
   toggleMute: () => void;
+  toggleMusicMute: () => void;
   playHit: () => void;
   playSuccess: () => void;
   playClick: () => void;
+  playMusic: () => void;
+  stopMusic: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
@@ -26,6 +30,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   successSound: null,
   clickSound: null,
   isMuted: false, // Start unmuted by default
+  isMusicMuted: false, // Start music unmuted by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
@@ -41,6 +46,25 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Log the change
     console.log(`Sound ${newMutedState ? 'muted' : 'unmuted'}`);
+  },
+
+  toggleMusicMute: () => {
+    const { isMusicMuted, backgroundMusic } = get();
+    const newMutedState = !isMusicMuted;
+    
+    set({ isMusicMuted: newMutedState });
+    
+    if (backgroundMusic) {
+      if (newMutedState) {
+        backgroundMusic.pause();
+      } else {
+        backgroundMusic.play().catch(error => {
+          console.log("Music play prevented:", error);
+        });
+      }
+    }
+    
+    console.log(`Music ${newMutedState ? 'muted' : 'unmuted'}`);
   },
   
   playHit: () => {
@@ -92,6 +116,25 @@ export const useAudio = create<AudioState>((set, get) => ({
       soundClone.play().catch(error => {
         console.log("Click sound play prevented:", error);
       });
+    }
+  },
+
+  playMusic: () => {
+    const { backgroundMusic, isMusicMuted } = get();
+    if (backgroundMusic && !isMusicMuted) {
+      backgroundMusic.loop = true;
+      backgroundMusic.volume = 0.3;
+      backgroundMusic.play().catch(error => {
+        console.log("Music play prevented:", error);
+      });
+    }
+  },
+
+  stopMusic: () => {
+    const { backgroundMusic } = get();
+    if (backgroundMusic) {
+      backgroundMusic.pause();
+      backgroundMusic.currentTime = 0;
     }
   }
 }));
