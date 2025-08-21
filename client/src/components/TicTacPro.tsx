@@ -3,8 +3,6 @@ import { useGameLogic } from '../hooks/useGameLogic';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
-import CompactEffectDisplay from './CompactEffectDisplay';
-import CompactObstacleDisplay from './CompactObstacleDisplay';
 
 const TicTacPro: React.FC = () => {
   const {
@@ -69,16 +67,6 @@ const TicTacPro: React.FC = () => {
           <div className="game-layout">
             <div className="level-section">
               <LevelDisplay level={gameState.currentLevel} />
-              
-              <div className="effects-section">
-                {gameState.currentEffect && (
-                  <CompactEffectDisplay effect={gameState.currentEffect} />
-                )}
-                
-                {gameState.currentObstacle && (
-                  <CompactObstacleDisplay obstacle={gameState.currentObstacle} />
-                )}
-              </div>
             </div>
             
             <div className="score-section">
