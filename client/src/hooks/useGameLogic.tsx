@@ -158,7 +158,12 @@ export const useGameLogic = () => {
 
       console.log('AI making move, board before AI move:', prev.board);
       
-      const emptyCells = getEmptyCells(prev.board);
+      // Check for empty cells (exclude wild cells from being playable)
+      const emptyCells = prev.board
+        .map((cell, index) => ({ cell, index }))
+        .filter(item => item.cell === null && !prev.effectState.wildCells.includes(item.index))
+        .map(item => item.index);
+      
       if (emptyCells.length === 0) {
         console.log('No empty cells, level complete');
         return { ...prev, phase: 'level_complete' };
@@ -174,12 +179,12 @@ export const useGameLogic = () => {
 
         switch (prev.currentEffect.id) {
           case 'e031': // O Drift - prefers edges
-            const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+            const emptyEdges = edges.filter(edge => prev.board[edge] === null && !prev.effectState.wildCells.includes(edge));
             aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
             break;
           
           case 'e032': // O Corner Habit - prefers corners
-            const emptyCorners = corners.filter(corner => prev.board[corner] === null);
+            const emptyCorners = corners.filter(corner => prev.board[corner] === null && !prev.effectState.wildCells.includes(corner));
             aiMoveIndex = emptyCorners.length > 0 ? emptyCorners[Math.floor(Math.random() * emptyCorners.length)] : aiMoveIndex;
             break;
           
@@ -189,12 +194,12 @@ export const useGameLogic = () => {
             break;
           
           case 'e039': // O Center Rush
-            aiMoveIndex = prev.board[center] === null ? center : aiMoveIndex;
+            aiMoveIndex = (prev.board[center] === null && !prev.effectState.wildCells.includes(center)) ? center : aiMoveIndex;
             break;
           
           case 'e040': // O Edge Rush
             if (prev.lastAIMove === null) {
-              const emptyEdges = edges.filter(edge => prev.board[edge] === null);
+              const emptyEdges = edges.filter(edge => prev.board[edge] === null && !prev.effectState.wildCells.includes(edge));
               aiMoveIndex = emptyEdges.length > 0 ? emptyEdges[Math.floor(Math.random() * emptyEdges.length)] : aiMoveIndex;
             }
             break;
