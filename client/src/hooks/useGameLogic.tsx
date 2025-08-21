@@ -2,13 +2,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { GameState, CellValue, Effect, Obstacle, EffectType } from '../types/game';
 import { gameData } from '../data/gameData';
 import { checkWinningLine, checkPlayerWinningLines, checkNewWinningLines, isBoardFull, getEmptyCells } from '../utils/gameUtils';
-import { useEffects } from './useEffects';
-import { useObstacles } from './useObstacles';
+import { useNewEffects } from './useNewEffects';
+import { useNewObstacles } from './useNewObstacles';
 
 const getRandomPositiveEffect = (): Effect => {
-  // Get only positive effects (scoring, placement, memory, economy, ai)
+  // Get only positive effects (scoring, memory, wild)
   const positiveEffects = gameData.effects.filter(effect => 
-    ['scoring', 'placement', 'memory', 'economy', 'ai'].includes(effect.type)
+    ['scoring', 'memory', 'wild'].includes(effect.type)
   );
   const effectData = positiveEffects[Math.floor(Math.random() * positiveEffects.length)];
   return {
@@ -82,8 +82,8 @@ const initialGameState: GameState = {
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const { processEffect, initializeEffect } = useEffects(gameState, setGameState);
-  const { processObstacle, initializeObstacle } = useObstacles(gameState, setGameState);
+  const { processEffect, initializeEffect } = useNewEffects(gameState, setGameState);
+  const { processObstacle, initializeObstacle } = useNewObstacles(gameState, setGameState);
 
   const startGame = useCallback(() => {
     // Show level preview before level 1 and after each level

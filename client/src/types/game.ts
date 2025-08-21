@@ -1,6 +1,6 @@
 export type CellValue = 'X' | 'O' | null;
 export type GamePhase = 'menu' | 'playing' | 'level_complete' | 'game_over';
-export type EffectType = 'scoring' | 'placement' | 'memory' | 'ai' | 'economy';
+export type EffectType = 'scoring' | 'memory' | 'wild';
 
 export interface GameState {
   phase: GamePhase;
