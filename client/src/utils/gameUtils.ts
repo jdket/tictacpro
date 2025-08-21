@@ -85,14 +85,17 @@ export const checkPlayerWinningLines = (board: CellValue[], player: 'X' | 'O', w
   return winningLines;
 };
 
-export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', lastMove: number): number[][] => {
+export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', lastMove: number, wildCells: number[] = []): number[][] => {
   const lines = getWinningLines();
   const winningLines: number[][] = [];
   
   for (const line of lines) {
     // Only check lines that include the cell that was just played
-    if (line.includes(lastMove) && line.every(cell => board[cell] === player)) {
-      winningLines.push(line);
+    if (line.includes(lastMove)) {
+      // Check if all cells in the line belong to the player OR are wild cells
+      if (line.every(cell => board[cell] === player || wildCells.includes(cell))) {
+        winningLines.push(line);
+      }
     }
   }
   
