@@ -8,7 +8,7 @@ import glsl from "vite-plugin-glsl";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Replace with your Railway app host if it changes
+// Railway app domain - adjust if yours changes
 const RAILWAY_HOST = "tictacpro-production-1824.up.railway.app";
 
 export default defineConfig({
@@ -32,9 +32,8 @@ export default defineConfig({
     host: true,
     allowedHosts: [RAILWAY_HOST],
     headers: {
-      // Allow your site to frame this app
-      "Content-Security-Policy": "frame-ancestors 'self' https://learnforfun.kids",
-      // CORS for static assets
+      // Allow framing from your parent domains
+      "Content-Security-Policy": "frame-ancestors 'self' https://learnforfun.kids https://learn-for-fun.replit.app",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "*"
