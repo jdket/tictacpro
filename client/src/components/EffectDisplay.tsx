@@ -1,46 +1,57 @@
 import React from 'react';
-import { Effect, Obstacle } from '../types/game';
+import { Effect } from '../types/game';
 
 interface EffectDisplayProps {
-  effect: Effect | null;
-  obstacle: Obstacle | null;
+  effect: Effect;
 }
 
-const EffectDisplay: React.FC<EffectDisplayProps> = ({ effect, obstacle }) => {
-  return (
-    <div className="effects-display">
-      {/* Positive Effect Window */}
-      <div className="effect-window positive-effect-window">
-        <div className="effect-header positive-header">
-          <h4>Active Effect</h4>
-        </div>
-        <div className="effect-content">
-          {effect ? (
-            <>
-              <div className="effect-name">{effect.name}</div>
-              <div className="effect-text">{effect.text}</div>
-            </>
-          ) : (
-            <div className="no-effect">No effect active</div>
-          )}
-        </div>
-      </div>
+const EffectDisplay: React.FC<EffectDisplayProps> = ({ effect }) => {
+  const getEffectIcon = (effectType: string): string => {
+    switch (effectType) {
+      case 'scoring':
+        return '💰';
+      case 'placement':
+        return '🎯';
+      case 'memory':
+        return '🧠';
+      case 'ai':
+        return '🤖';
+      case 'economy':
+        return '💎';
+      default:
+        return '✨';
+    }
+  };
 
-      {/* Negative Effect Window */}
-      <div className="effect-window negative-effect-window">
-        <div className="effect-header negative-header">
-          <h4>Active Obstacle</h4>
-        </div>
-        <div className="effect-content">
-          {obstacle ? (
-            <>
-              <div className="effect-name">{obstacle.name}</div>
-              <div className="effect-text">{obstacle.text}</div>
-            </>
+  const getEffectClassName = (effectType: string): string => {
+    return `effect-display effect-${effectType}`;
+  };
+
+  return (
+    <div className={getEffectClassName(effect.type)}>
+      <div className="effect-header">
+        <span className="effect-icon">{getEffectIcon(effect.type)}</span>
+        <h3 className="effect-name">{effect.name}</h3>
+      </div>
+      <p className="effect-description">{effect.text}</p>
+      <div className="effect-value">
+        {effect.type === 'scoring' || effect.type === 'economy' ? (
+          effect.value < 10 ? (
+            <span className="value-highlight">x{effect.value} multiplier</span>
           ) : (
-            <div className="no-effect">No obstacle active</div>
-          )}
-        </div>
+            <span className="value-highlight">+{effect.value} pts</span>
+          )
+        ) : effect.type === 'placement' && (effect.value === 3000) ? (
+          <span className="value-highlight">+{effect.value} pts</span>
+        ) : effect.type === 'memory' && (effect.value >= 1000) ? (
+          <span className="value-highlight">+{effect.value} pts</span>
+        ) : effect.type === 'placement' ? (
+          <span className="ability-highlight">Special Ability</span>
+        ) : effect.type === 'memory' ? (
+          <span className="memory-highlight">Memory Challenge</span>
+        ) : (
+          <span className="ai-highlight">AI Behavior</span>
+        )}
       </div>
     </div>
   );
