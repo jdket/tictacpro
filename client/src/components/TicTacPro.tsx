@@ -3,8 +3,6 @@ import { useGameLogic } from '../hooks/useGameLogic';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
-import EffectDisplay from './EffectDisplay';
-import ObstacleDisplay from './ObstacleDisplay';
 import CompactEffectDisplay from './CompactEffectDisplay';
 import CompactObstacleDisplay from './CompactObstacleDisplay';
 
@@ -90,14 +88,7 @@ const TicTacPro: React.FC = () => {
               />
             </div>
             
-            <div className="effects-section">
-              {gameState.currentEffect && (
-                <EffectDisplay effect={gameState.currentEffect} />
-              )}
-              {gameState.currentObstacle && (
-                <ObstacleDisplay obstacle={gameState.currentObstacle} />
-              )}
-            </div>
+            <div></div> {/* Empty space for grid balance */}
           </div>
 
           <div className="board-section">

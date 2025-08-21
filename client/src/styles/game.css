@@ -537,13 +537,6 @@
   align-self: center;
 }
 
-.effects-section {
-  justify-self: end;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .board-section {
   grid-column: 1 / -1;
   justify-self: center;
