@@ -451,21 +451,25 @@
 
 /* Dual Score Display */
 .dual-score-display {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 20px 0;
+  width: 300px;
 }
 
-.score-row-1 {
+.score-section-player {
   display: flex;
-  justify-content: center;
-  gap: 80px;
-  margin-bottom: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.score-row-2 {
+.score-section-opponent {
   display: flex;
-  justify-content: center;
-  gap: 80px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .score-label {
