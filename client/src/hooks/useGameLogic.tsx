@@ -232,7 +232,7 @@ export const useGameLogic = () => {
       }
       
       // Check if level is complete
-      const isComplete = isBoardFull(newBoard);
+      const isComplete = isBoardFull(newBoard, prev.effectState.wildCells);
       
       console.log('Board is complete:', isComplete);
       
@@ -326,7 +326,7 @@ export const useGameLogic = () => {
       }
       
       // Check if board is complete after player move
-      const isComplete = isBoardFull(newBoard);
+      const isComplete = isBoardFull(newBoard, prev.effectState.wildCells);
       console.log('Board complete after player move:', isComplete);
       
       return {

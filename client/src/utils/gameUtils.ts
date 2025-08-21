@@ -102,8 +102,10 @@ export const checkNewWinningLines = (board: CellValue[], player: 'X' | 'O', last
   return winningLines;
 };
 
-export const isBoardFull = (board: CellValue[]): boolean => {
-  return board.every(cell => cell !== null);
+export const isBoardFull = (board: CellValue[], wildCells: number[] = []): boolean => {
+  // Check if all playable cells are filled
+  // A cell is considered "filled" if it's either occupied by a player or is a wild cell
+  return board.every((cell, index) => cell !== null || wildCells.includes(index));
 };
 
 export const getEmptyCells = (board: CellValue[], wildCells: number[] = []): number[] => {
