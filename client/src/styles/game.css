@@ -521,6 +521,15 @@
 
 .level-section {
   justify-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.effects-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .score-section {
@@ -551,6 +560,46 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
+}
+
+/* Compact Effect/Obstacle Displays */
+.compact-effect-display,
+.compact-obstacle-display {
+  width: 180px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.compact-effect-display.good-effect {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.compact-obstacle-display.bad-effect {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.compact-effect-header,
+.compact-obstacle-header {
+  margin-bottom: 8px;
+}
+
+.compact-effect-name,
+.compact-obstacle-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.compact-effect-text,
+.compact-obstacle-text {
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.4;
 }
 
 /* Special indicators */
