@@ -253,7 +253,7 @@ export const useEffects = (
           ...prev,
           effectState: {
             ...prev.effectState,
-            hiddenCells: [0, 2, 6, 8]
+            hiddenCells: [0, 4, 20, 24]
           }
         }));
         break;
@@ -263,7 +263,7 @@ export const useEffects = (
           ...prev,
           effectState: {
             ...prev.effectState,
-            hiddenCells: [1, 3, 5, 7]
+            hiddenCells: [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23]
           }
         }));
         break;

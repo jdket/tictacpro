@@ -97,15 +97,9 @@ const TicTacPro: React.FC = () => {
       {gameState.phase === 'level_complete' && (
         <div className="level-complete-screen">
           <h2>Level {gameState.currentLevel} Complete!</h2>
-          <div className="level-complete-scores">
-            <div className="score-section-player">
-              <span className="score-label">Your Score</span>
-              <span className="score-value">{gameState.score.toLocaleString()}</span>
-            </div>
-            <div className="score-section-opponent">
-              <span className="score-label">Opponent Score</span>
-              <span className="score-value">{gameState.opponentScore.toLocaleString()}</span>
-            </div>
+          <div className="round-scores">
+            <p>Your Score: {gameState.score}</p>
+            <p>Opponent Score: {gameState.opponentScore}</p>
           </div>
           {gameState.currentLevel < 10 ? (
             <button onClick={nextLevel} className="next-level-button">
@@ -115,14 +109,8 @@ const TicTacPro: React.FC = () => {
             <div className="game-complete">
               <h2>Game Complete!</h2>
               <div className="final-scores">
-                <div className="score-section-player">
-                  <span className="score-label">Final Score</span>
-                  <span className="score-value">{gameState.score.toLocaleString()}</span>
-                </div>
-                <div className="score-section-opponent">
-                  <span className="score-label">Final Opponent Score</span>
-                  <span className="score-value">{gameState.opponentScore.toLocaleString()}</span>
-                </div>
+                <p>Final Score: {gameState.score}</p>
+                <p>Opponent Final Score: {gameState.opponentScore}</p>
               </div>
               <button onClick={startGame} className="restart-button">
                 Play Again

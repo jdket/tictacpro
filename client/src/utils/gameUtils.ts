@@ -116,11 +116,11 @@ export const getCellType = (index: number): 'corner' | 'edge' | 'center' => {
 };
 
 export const getCellRow = (cellIndex: number): number => {
-  return Math.floor(cellIndex / 3);
+  return Math.floor(cellIndex / 5);
 };
 
 export const getCellColumn = (cellIndex: number): number => {
-  return cellIndex % 3;
+  return cellIndex % 5;
 };
 
 export const getAdjacentCells = (cellIndex: number): number[] => {
@@ -128,10 +128,10 @@ export const getAdjacentCells = (cellIndex: number): number[] => {
   const col = getCellColumn(cellIndex);
   const adjacent: number[] = [];
   
-  for (let r = Math.max(0, row - 1); r <= Math.min(2, row + 1); r++) {
-    for (let c = Math.max(0, col - 1); c <= Math.min(2, col + 1); c++) {
-      const index = r * 3 + c;
-      if (index !== cellIndex && index >= 0 && index < 9) {
+  for (let r = Math.max(0, row - 1); r <= Math.min(4, row + 1); r++) {
+    for (let c = Math.max(0, col - 1); c <= Math.min(4, col + 1); c++) {
+      const index = r * 5 + c;
+      if (index !== cellIndex && index >= 0 && index < 25) {
         adjacent.push(index);
       }
     }
@@ -143,16 +143,16 @@ export const getAdjacentCells = (cellIndex: number): number[] => {
 export const getMirroredCell = (cellIndex: number): number => {
   const row = getCellRow(cellIndex);
   const col = getCellColumn(cellIndex);
-  const mirroredCol = 2 - col;
-  return row * 3 + mirroredCol;
+  const mirroredCol = 4 - col;
+  return row * 5 + mirroredCol;
 };
 
 export const applyGravity = (cellIndex: number, board: CellValue[]): number => {
   const col = getCellColumn(cellIndex);
   
   // Find the lowest empty cell in the column
-  for (let row = 2; row >= 0; row--) {
-    const targetIndex = row * 3 + col;
+  for (let row = 4; row >= 0; row--) {
+    const targetIndex = row * 5 + col;
     if (board[targetIndex] === null) {
       return targetIndex;
     }
@@ -170,17 +170,27 @@ export const getRandomEmptyCell = (board: CellValue[], excludeCells: number[] = 
 };
 
 export const isLineType = (line: number[], type: 'row' | 'column' | 'diagonal'): boolean => {
-  const rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
-  const columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
-  const diagonals = [[0, 4, 8], [2, 4, 6]];
+  const firstCell = line[0];
+  const firstRow = Math.floor(firstCell / 5);
+  const firstCol = firstCell % 5;
   
   switch (type) {
     case 'row':
-      return rows.some(row => row.every(cell => line.includes(cell)));
+      // Check if all cells are in the same row and consecutive
+      return line.every(cell => Math.floor(cell / 5) === firstRow) &&
+             line.length === 4 &&
+             line.every((cell, i) => cell === firstCell + i);
     case 'column':
-      return columns.some(col => col.every(cell => line.includes(cell)));
+      // Check if all cells are in the same column and consecutive
+      return line.every(cell => cell % 5 === firstCol) &&
+             line.length === 4 &&
+             line.every((cell, i) => cell === firstCell + (i * 5));
     case 'diagonal':
-      return diagonals.some(diag => diag.every(cell => line.includes(cell)));
+      // Check if it's a diagonal pattern
+      if (line.length !== 4) return false;
+      const isMainDiagonal = line.every((cell, i) => cell === firstCell + (i * 6)); // +6 for main diagonal in 5x5
+      const isAntiDiagonal = line.every((cell, i) => cell === firstCell + (i * 4)); // +4 for anti-diagonal in 5x5
+      return isMainDiagonal || isAntiDiagonal;
     default:
       return false;
   }
