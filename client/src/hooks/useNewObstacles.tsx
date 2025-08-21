@@ -100,90 +100,125 @@ export const useNewObstacles = (
   };
 
   const initializeObstacle = useCallback((obstacle: Obstacle) => {
-    switch (obstacle.id) {
-      case 'o001': // Memory Drain - Dim 5 tiles, Dimmed tiles give Opponent double score
-        const dimCells5 = getRandomCells(5);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: dimCells5
-          }
-        }));
-        break;
+    setGameState(prev => {
+      // Get existing effect cells to avoid conflicts
+      const existingDimmed = prev.effectState.dimmedCells;
+      const existingWild = prev.effectState.wildCells;
+      const allExistingCells = [...existingDimmed, ...existingWild];
       
-      case 'o002': // Wild Drain - 5 tiles become Wild, Wild tiles in your 4-in-a-row give Opponent double score
-        const wildCells5 = getRandomCells(5);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells5
-          }
-        }));
-        break;
+      switch (obstacle.id) {
+        case 'o001': // Memory Drain - Dim 5 tiles, Dimmed tiles give Opponent double score
+          const dimCells5 = getRandomCells(5, undefined, true, allExistingCells);
+          console.log(`Memory Drain: Adding dimmed cells at positions ${dimCells5.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...dimCells5]
+            }
+          };
+        
+        case 'o002': // Wild Drain - 5 tiles become Wild, Wild tiles in your 4-in-a-row give Opponent double score
+          const wildCells5 = getRandomCells(5, undefined, true, allExistingCells);
+          console.log(`Wild Drain: Adding wild cells at positions ${wildCells5.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells5]
+            }
+          };
       
-      case 'o003': // Dim Penalty - Dim 2 tiles, any 4-in-a-row next to Dimmed tiles loses 1000 pts
-        const dimCells2 = getRandomCells(2);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: dimCells2
-          }
-        }));
-        break;
-      
-      case 'o004': // Wild Trap - 2 tiles become Wild, any 4-in-a-row next to Wild tiles loses 1000 pts
-        const wildCells2 = getRandomCells(2);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells2
-          }
-        }));
-        break;
-      
-      case 'o005': // Dim Flood - Dim 8 tiles at random
-        const dimCells8 = getRandomCells(8);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            dimmedCells: dimCells8
-          }
-        }));
-        break;
-      
-      case 'o006': // Wild Penalty - 5 tiles become Wild, Wild tiles in your line subtract 1000 pts
-        const wildCells5Penalty = getRandomCells(5);
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            wildCells: wildCells5Penalty
-          }
-        }));
-        break;
-    }
-  }, [setGameState]);
+        case 'o003': // Dim Penalty - Dim 2 tiles, any 4-in-a-row next to Dimmed tiles loses 1000 pts
+          const dimCells2 = getRandomCells(2, undefined, true, allExistingCells);
+          console.log(`Dim Penalty: Adding dimmed cells at positions ${dimCells2.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...dimCells2]
+            }
+          };
+        
+        case 'o004': // Wild Trap - 2 tiles become Wild, any 4-in-a-row next to Wild tiles loses 1000 pts
+          const wildCells2 = getRandomCells(2, undefined, true, allExistingCells);
+          console.log(`Wild Trap: Adding wild cells at positions ${wildCells2.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells2]
+            }
+          };
+        
+        case 'o005': // Dim Flood - Dim 8 tiles at random
+          const dimCells8 = getRandomCells(8, undefined, true, allExistingCells);
+          console.log(`Dim Flood: Adding 8 dimmed cells at positions ${dimCells8.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              dimmedCells: [...prev.effectState.dimmedCells, ...dimCells8]
+            }
+          };
+        
+        case 'o006': // Wild Penalty - 5 tiles become Wild, Wild tiles in your line subtract 1000 pts
+          const wildCells5Penalty = getRandomCells(5, undefined, true, allExistingCells);
+          console.log(`Wild Penalty: Adding wild cells at positions ${wildCells5Penalty.join(', ')}`);
+          return {
+            ...prev,
+            effectState: {
+              ...prev.effectState,
+              wildCells: [...prev.effectState.wildCells, ...wildCells5Penalty]
+            }
+          };
+        
+        default:
+          return prev;
+      }
+    });
+  }, []);
 
   return { initializeObstacle, processObstacle };
 };
 
-// Helper function
-const getRandomCells = (count: number, pool?: number[]): number[] => {
+// Helper functions
+const getRandomCells = (count: number, pool?: number[], avoidAdjacent?: boolean, existingCells?: number[]): number[] => {
   const availableCells = pool || Array.from({ length: 25 }, (_, i) => i);
   const selected: number[] = [];
+  const allExistingCells = [...(existingCells || [])];
   
   while (selected.length < count && selected.length < availableCells.length) {
     const randomIndex = Math.floor(Math.random() * availableCells.length);
     const cell = availableCells[randomIndex];
-    if (!selected.includes(cell)) {
-      selected.push(cell);
+    
+    if (!selected.includes(cell) && !allExistingCells.includes(cell)) {
+      // Check if we need to avoid adjacent cells
+      if (avoidAdjacent && (selected.length > 0 || allExistingCells.length > 0)) {
+        const adjacentToSelected = selected.some(selectedCell => areAdjacent(cell, selectedCell));
+        const adjacentToExisting = allExistingCells.some(existingCell => areAdjacent(cell, existingCell));
+        
+        if (!adjacentToSelected && !adjacentToExisting) {
+          selected.push(cell);
+        }
+      } else {
+        selected.push(cell);
+      }
     }
   }
   
   return selected;
+};
+
+const areAdjacent = (cell1: number, cell2: number): boolean => {
+  const row1 = Math.floor(cell1 / 5);
+  const col1 = cell1 % 5;
+  const row2 = Math.floor(cell2 / 5);
+  const col2 = cell2 % 5;
+  
+  const rowDiff = Math.abs(row1 - row2);
+  const colDiff = Math.abs(col1 - col2);
+  
+  // Adjacent if they're in neighboring cells (including diagonally)
+  return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
 };
