@@ -193,11 +193,23 @@ const getRandomCells = (count: number, pool?: number[], avoidAdjacent?: boolean,
   const selected: number[] = [];
   const allExistingCells = [...(existingCells || [])];
   
-  while (selected.length < count && selected.length < availableCells.length) {
-    const randomIndex = Math.floor(Math.random() * availableCells.length);
-    const cell = availableCells[randomIndex];
+  // Filter out cells that are already occupied by player moves
+  const validCells = availableCells.filter(cell => !allExistingCells.includes(cell));
+  
+  // If we don't have enough valid cells, return what we can
+  if (validCells.length < count) {
+    console.warn(`Not enough valid cells for ${count} ${cellType} cells. Available: ${validCells.length}`);
+    return validCells.slice(0, count);
+  }
+  
+  let attempts = 0;
+  const maxAttempts = validCells.length * 2; // Prevent infinite loops
+  
+  while (selected.length < count && attempts < maxAttempts) {
+    const randomIndex = Math.floor(Math.random() * validCells.length);
+    const cell = validCells[randomIndex];
     
-    if (!selected.includes(cell) && !allExistingCells.includes(cell)) {
+    if (!selected.includes(cell)) {
       // Check if we need to avoid adjacent cells
       if (avoidAdjacent && selected.length > 0) {
         const adjacentToSelected = selected.some(selectedCell => areAdjacent(cell, selectedCell));
@@ -209,6 +221,15 @@ const getRandomCells = (count: number, pool?: number[], avoidAdjacent?: boolean,
         selected.push(cell);
       }
     }
+    
+    attempts++;
+  }
+  
+  // If we couldn't find enough non-adjacent cells, fill remaining spots without adjacency constraint
+  if (selected.length < count) {
+    console.warn(`Could only place ${selected.length} non-adjacent ${cellType} cells, filling remaining ${count - selected.length} without adjacency constraint`);
+    const remaining = validCells.filter(cell => !selected.includes(cell));
+    selected.push(...remaining.slice(0, count - selected.length));
   }
   
   return selected;
