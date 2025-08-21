@@ -115,11 +115,9 @@ export const useEffects = (
       
       case 'e019': // Pattern Master
         if (winningLine) {
-          const isAlternating = winningLine.every((cell, i, arr) => {
-            if (i === 0) return true;
-            return (cell % 2) !== (arr[i-1] % 2);
-          });
-          if (isAlternating) {
+          // Simple pattern: line goes across the middle row (row 2)
+          const isMiddleRow = winningLine.every(cell => Math.floor(cell / 5) === 2);
+          if (isMiddleRow) {
             coins += effect.value;
           }
         }
@@ -173,15 +171,23 @@ export const useEffects = (
         // TODO: Implement when streakCount is tracked in GameState
         break;
       
-      case 'e043': // Even Up
-        if (winningLine && winningLine.every(cell => cell % 2 === 0)) {
-          coins += effect.value;
+      case 'e043': // Top Half
+        if (winningLine) {
+          // Top half is rows 0 and 1 (cells 0-9)
+          const isTopHalf = winningLine.every(cell => Math.floor(cell / 5) <= 1);
+          if (isTopHalf) {
+            coins += effect.value;
+          }
         }
         break;
       
-      case 'e044': // Odd Up
-        if (winningLine && winningLine.every(cell => cell % 2 === 1)) {
-          coins += effect.value;
+      case 'e044': // Bottom Half
+        if (winningLine) {
+          // Bottom half is rows 3 and 4 (cells 15-24)
+          const isBottomHalf = winningLine.every(cell => Math.floor(cell / 5) >= 3);
+          if (isBottomHalf) {
+            coins += effect.value;
+          }
         }
         break;
       
@@ -245,28 +251,11 @@ export const useEffects = (
         }
         break;
       
-      case 'e022': // Flash Path
+      case 'e022': // Quick Peek
         const lines = getWinningLines();
         const randomLine = lines[Math.floor(Math.random() * lines.length)];
-        setGameState(prev => ({
-          ...prev,
-          effectState: {
-            ...prev.effectState,
-            flashLine: randomLine
-          },
-          showingFlash: true
-        }));
-        
-        setTimeout(() => {
-          setGameState(prev => ({
-            ...prev,
-            showingFlash: false,
-            effectState: {
-              ...prev.effectState,
-              flashLine: null
-            }
-          }));
-        }, 1000);
+        console.log('Quick Peek shows winning line:', randomLine);
+        // Just log it, no visual effects for children
         break;
       
       case 'e025': // Hide Corners
