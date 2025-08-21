@@ -517,6 +517,7 @@
   width: 100%;
   max-width: 1000px;
   align-items: start;
+  margin-bottom: 20px;
 }
 
 .level-section {
@@ -524,6 +525,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  margin-top: 60px;
 }
 
 .effects-section {
@@ -540,7 +542,7 @@
 .board-section {
   grid-column: 1 / -1;
   justify-self: center;
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 /* Level Complete Screen Scores */
