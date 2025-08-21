@@ -67,20 +67,6 @@ const TicTacPro: React.FC = () => {
           <div className="game-layout">
             <div className="level-section">
               <LevelDisplay level={gameState.currentLevel} />
-              <div className="active-effects">
-                {gameState.currentEffect && (
-                  <div className="active-effect good-effect">
-                    <h4>{gameState.currentEffect.name}</h4>
-                    <p>{gameState.currentEffect.text}</p>
-                  </div>
-                )}
-                {gameState.currentObstacle && (
-                  <div className="active-obstacle bad-effect">
-                    <h4>{gameState.currentObstacle.name}</h4>
-                    <p>{gameState.currentObstacle.text}</p>
-                  </div>
-                )}
-              </div>
             </div>
             
             <div className="score-section">
@@ -120,21 +106,6 @@ const TicTacPro: React.FC = () => {
               <span className="score-label">Opponent Score</span>
               <span className="score-value">{gameState.opponentScore.toLocaleString()}</span>
             </div>
-          </div>
-          
-          <div className="current-level-effects">
-            {gameState.currentEffect && (
-              <div className="current-effect good-effect">
-                <h3>{gameState.currentEffect.name}</h3>
-                <p>{gameState.currentEffect.text}</p>
-              </div>
-            )}
-            {gameState.currentObstacle && (
-              <div className="current-obstacle bad-effect">
-                <h3>{gameState.currentObstacle.name}</h3>
-                <p>{gameState.currentObstacle.text}</p>
-              </div>
-            )}
           </div>
           {gameState.currentLevel < 10 ? (
             <button onClick={nextLevel} className="next-level-button">
