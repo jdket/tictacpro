@@ -58,6 +58,9 @@ export const useAudio = create<AudioState>((set, get) => ({
       if (newMutedState) {
         backgroundMusic.pause();
       } else {
+        // Ensure loop is maintained when resuming music
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 0.3;
         backgroundMusic.play().catch(error => {
           console.log("Music play prevented:", error);
         });
