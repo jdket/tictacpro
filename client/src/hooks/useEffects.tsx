@@ -77,18 +77,58 @@ export const useEffects = (
         }
         break;
       
+      case 'e011': // Speed Bonus
+        if (gameState.moveHistory.length < 3) {
+          coins += effect.value;
+        }
+        break;
+      
       case 'e012': // Fast Corner
         if ([0, 4, 20, 24].includes(cellIndex)) {
           coins += effect.value;
         }
         break;
       
-      case 'e013': // First Edge
-        if (gameState.moveHistory.length === 0) {
+      case 'e013': // Multi Strike
+        // TODO: Implement when linesCompleted is tracked in GameState
+        break;
+      
+      case 'e014': // Line Streak
+        // TODO: Implement when streak tracking is added
+        break;
+      
+      case 'e015': // Center Power
+        if (winningLine && winningLine.includes(12)) {
+          coins += effect.value;
+        }
+        break;
+      
+      case 'e016': // Edge Master
+        if (winningLine) {
           const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
-          if (edges.includes(cellIndex)) {
+          const edgeCount = winningLine.filter(cell => edges.includes(cell)).length;
+          if (edgeCount >= 3) {
             coins += effect.value;
           }
+        }
+        break;
+      
+      case 'e019': // Pattern Master
+        if (winningLine) {
+          const isAlternating = winningLine.every((cell, i, arr) => {
+            if (i === 0) return true;
+            return (cell % 2) !== (arr[i-1] % 2);
+          });
+          if (isAlternating) {
+            coins += effect.value;
+          }
+        }
+        break;
+      
+      case 'e020': // Board Control
+        if (winningLine) {
+          const emptyCells = gameState.board.filter(cell => cell === null).length;
+          coins += emptyCells * effect.value;
         }
         break;
       
@@ -184,42 +224,8 @@ export const useEffects = (
 
   const initializeEffect = useCallback((effect: Effect) => {
     switch (effect.id) {
-      case 'e011': // Lucky Corner
-        if (gameState.moveHistory.length === 0) {
-          const corners = [0, 4, 20, 24];
-          const emptyCorners = corners.filter(c => gameState.board[c] === null);
-          if (emptyCorners.length > 0) {
-            const randomCorner = emptyCorners[Math.floor(Math.random() * emptyCorners.length)];
-            setGameState(prev => {
-              const newBoard = [...prev.board];
-              newBoard[randomCorner] = 'X';
-              return {
-                ...prev,
-                board: newBoard,
-                moveHistory: [randomCorner],
-                lastPlayerMove: randomCorner
-              };
-            });
-          }
-        }
-        break;
-      
-      case 'e015': // Free Center
-        if (gameState.moveHistory.length === 0 && gameState.board[12] === null) {
-          setGameState(prev => {
-            const newBoard = [...prev.board];
-            newBoard[12] = 'X';
-            return {
-              ...prev,
-              board: newBoard,
-              moveHistory: [12],
-              lastPlayerMove: 12,
-              firstMoveWasCenter: true,
-              usedCenter: true
-            };
-          });
-        }
-        break;
+      // Most scoring effects don't need initialization
+      // Only special effects that modify game state need initialization here
       
       case 'e021': // Memory Mark
         const emptyCells = gameState.board
