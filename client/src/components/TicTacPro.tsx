@@ -5,6 +5,7 @@ import { useAudio } from '../lib/stores/useAudio';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
+import { VolumeX, Volume2 } from 'lucide-react';
 
 const TicTacPro: React.FC = () => {
   const {
@@ -16,7 +17,7 @@ const TicTacPro: React.FC = () => {
     useSpecialAbility
   } = useGameLogic();
   
-  const { setClickSound } = useAudio();
+  const { setClickSound, isMuted, toggleMute } = useAudio();
 
   const handleCellClick = (cellIndex: number) => {
     if (gameState.phase === 'playing') {
@@ -41,6 +42,16 @@ const TicTacPro: React.FC = () => {
 
   return (
     <div className="tic-tac-pro">
+      {/* Sound button - always visible in upper right */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={toggleMute}
+          className="bg-white/90 hover:bg-white border border-gray-300 rounded-lg p-2 shadow-lg transition-colors"
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
+      </div>
       {gameState.phase === 'menu' && !gameState.showLevelPreview && (
         <div className="menu-screen">
           <h1>TicTacPro</h1>
