@@ -23,16 +23,6 @@ const getRandomObstacle = (): Obstacle => {
 };
 
 const getEffectsForLevel = (level: number): Effect[] => {
-  // For testing wild cells, force a wild effect for level 1
-  if (level === 1) {
-    const wildEffects = gameData.effects.filter(effect => effect.type === 'wild');
-    const selectedWild = wildEffects[Math.floor(Math.random() * wildEffects.length)];
-    console.log('Forcing wild effect for testing:', selectedWild.name);
-    return [{
-      ...selectedWild,
-      type: selectedWild.type as EffectType
-    }];
-  }
   // Always have exactly 1 positive effect per level
   return [getRandomPositiveEffect()];
 };
@@ -238,7 +228,7 @@ export const useGameLogic = () => {
         // Use the first winning line for display (or keep existing if we already had one)
         newWinningLine = newWinningLines[0];
         
-        console.log(`AI scored ${opponentScoreIncrease} points for ${lineCount} NEW line(s)`);
+        console.log(`AI scored ${opponentScoreIncrease} points for ${lineCount} NEW scoring line(s)`);
       }
       
       // Check if level is complete
@@ -279,7 +269,7 @@ export const useGameLogic = () => {
       console.log('Checking for X lines with wild cells:', prev.effectState.wildCells);
       const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex, prev.effectState.wildCells);
       const lineCount = newWinningLines.length;
-      console.log('Found', lineCount, 'new player lines:', newWinningLines);
+      console.log('Found', lineCount, 'new player scoring lines:', newWinningLines);
       
       let scoreIncrease = 0;
       let newWinningLine = prev.winningLine;
@@ -308,7 +298,7 @@ export const useGameLogic = () => {
         // Use the first winning line for display (or keep existing if we already had one)
         newWinningLine = newWinningLines[0];
         
-        console.log(`Player scored ${scoreIncrease} points for ${lineCount} NEW line(s)`);
+        console.log(`Player scored ${scoreIncrease} points for ${lineCount} NEW scoring line(s)`);
         
         // Update line count and streak tracking
         newLinesCompleted = prev.linesCompleted + lineCount;
