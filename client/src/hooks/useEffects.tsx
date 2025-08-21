@@ -77,6 +77,21 @@ export const useEffects = (
         }
         break;
       
+      case 'e012': // Fast Corner
+        if ([0, 4, 20, 24].includes(cellIndex)) {
+          coins += effect.value;
+        }
+        break;
+      
+      case 'e013': // First Edge
+        if (gameState.moveHistory.length === 0) {
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+          if (edges.includes(cellIndex)) {
+            coins += effect.value;
+          }
+        }
+        break;
+      
       case 'e017': // Edge Magnet
         if (winningLine && gameState.moveHistory.length === 1) {
           const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];

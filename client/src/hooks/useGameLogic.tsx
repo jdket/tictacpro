@@ -275,10 +275,26 @@ export const useGameLogic = () => {
           console.log(`Player created ${lineCount} lines! Bonus awarded!`);
         }
         
+        // Apply effects for each winning line
+        for (const line of newWinningLines) {
+          const effectBonus = processEffect(cellIndex, line);
+          scoreIncrease += effectBonus;
+          if (effectBonus > 0) {
+            console.log(`Effect bonus: +${effectBonus} points`);
+          }
+        }
+        
         // Use the first winning line for display (or keep existing if we already had one)
         newWinningLine = newWinningLines[0];
         
         console.log(`Player scored ${scoreIncrease} points for ${lineCount} NEW line(s)`);
+      } else {
+        // Check for effects that trigger on any move (not just winning moves)
+        const effectBonus = processEffect(cellIndex, null);
+        scoreIncrease += effectBonus;
+        if (effectBonus > 0) {
+          console.log(`Move effect bonus: +${effectBonus} points`);
+        }
       }
       
       // Check if board is complete after player move
