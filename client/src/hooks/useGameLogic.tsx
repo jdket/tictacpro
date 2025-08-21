@@ -66,6 +66,7 @@ const initialGameState: GameState = {
     frozenCells: [],
     blockedCells: [],
     dimmedCells: [],
+    wildCells: [],
     lastRowUsed: null,
     lastColumnUsed: null,
     trailX: null,

@@ -51,11 +51,19 @@ export const getWinningLines = (): number[][] => {
   return lines;
 };
 
-export const checkWinningLine = (board: CellValue[]): number[] | null => {
+export const checkWinningLine = (board: CellValue[], wildCells: number[] = []): number[] | null => {
   const lines = getWinningLines();
   
   for (const line of lines) {
-    if (line.every(cell => board[cell] && board[cell] === board[line[0]])) {
+    // Check if this line can form a winning combination considering wild cells
+    const playerCells = line.filter(cell => board[cell] === 'X' || wildCells.includes(cell));
+    const aiCells = line.filter(cell => board[cell] === 'O' || wildCells.includes(cell));
+    
+    // For a line to win, all 4 cells must belong to the same player (including wilds)
+    if (playerCells.length === 4 && line.every(cell => board[cell] === 'X' || wildCells.includes(cell))) {
+      return line;
+    }
+    if (aiCells.length === 4 && line.every(cell => board[cell] === 'O' || wildCells.includes(cell))) {
       return line;
     }
   }
@@ -63,12 +71,13 @@ export const checkWinningLine = (board: CellValue[]): number[] | null => {
   return null;
 };
 
-export const checkPlayerWinningLines = (board: CellValue[], player: 'X' | 'O'): number[][] => {
+export const checkPlayerWinningLines = (board: CellValue[], player: 'X' | 'O', wildCells: number[] = []): number[][] => {
   const lines = getWinningLines();
   const winningLines: number[][] = [];
   
   for (const line of lines) {
-    if (line.every(cell => board[cell] === player)) {
+    // Check if all cells in the line belong to the player or are wild
+    if (line.every(cell => board[cell] === player || wildCells.includes(cell))) {
       winningLines.push(line);
     }
   }
@@ -94,10 +103,23 @@ export const isBoardFull = (board: CellValue[]): boolean => {
   return board.every(cell => cell !== null);
 };
 
-export const getEmptyCells = (board: CellValue[]): number[] => {
+export const getEmptyCells = (board: CellValue[], wildCells: number[] = []): number[] => {
   return board
-    .map((cell, index) => cell === null ? index : -1)
+    .map((cell, index) => (cell === null && !wildCells.includes(index)) ? index : -1)
     .filter(index => index !== -1);
+};
+
+export const isValidMove = (cellIndex: number, board: CellValue[], wildCells: number[] = [], blockedCells: number[] = []): boolean => {
+  // Cell must be empty (null)
+  if (board[cellIndex] !== null) return false;
+  
+  // Cell cannot be wild (wild cells cannot be played on)
+  if (wildCells.includes(cellIndex)) return false;
+  
+  // Cell cannot be blocked
+  if (blockedCells.includes(cellIndex)) return false;
+  
+  return true;
 };
 
 export const getCellType = (index: number): 'corner' | 'edge' | 'center' => {

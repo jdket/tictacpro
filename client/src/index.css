@@ -28,3 +28,24 @@ canvas {
   height: 100% !important;
   touch-action: none;
 }
+/* Wild cell styling */
+.cell-wild {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  border: 2px solid #ff6b35;
+  position: relative;
+  cursor: not-allowed;
+}
+
+/* Wild overlay for wild cells */
+.wild-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff6b35;
+  pointer-events: none;
+  z-index: 2;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
