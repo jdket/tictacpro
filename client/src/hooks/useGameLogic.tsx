@@ -297,6 +297,13 @@ export const useGameLogic = () => {
         }
       }
       
+      // Process obstacles for scoring penalties
+      const obstacleResult = processObstacle(cellIndex, 'player');
+      scoreIncrease += obstacleResult.scorePenalty;
+      if (obstacleResult.scorePenalty < 0) {
+        console.log(`Obstacle penalty: ${obstacleResult.scorePenalty} points`);
+      }
+      
       // Check if board is complete after player move
       const isComplete = isBoardFull(newBoard);
       console.log('Board complete after player move:', isComplete);

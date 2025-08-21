@@ -128,8 +128,8 @@ export const useObstacles = (
     }
   }, [setGameState]);
 
-  const processObstacle = useCallback((cellIndex: number, player: 'player' | 'ai'): number => {
-    if (!gameState.currentObstacle) return cellIndex;
+  const processObstacle = useCallback((cellIndex: number, player: 'player' | 'ai'): { newCellIndex: number; scorePenalty: number } => {
+    if (!gameState.currentObstacle) return { newCellIndex: cellIndex, scorePenalty: 0 };
     
     const obstacle = gameState.currentObstacle;
     
@@ -139,7 +139,7 @@ export const useObstacles = (
           const adjacent = getAdjacentCells(cellIndex);
           const emptyAdjacent = adjacent.filter(cell => gameState.board[cell] === null);
           if (emptyAdjacent.length > 0) {
-            return emptyAdjacent[Math.floor(Math.random() * emptyAdjacent.length)];
+            return { newCellIndex: emptyAdjacent[Math.floor(Math.random() * emptyAdjacent.length)], scorePenalty: 0 };
           }
         }
         break;
@@ -175,7 +175,7 @@ export const useObstacles = (
       
       case 'o012': // Gravity
         if (player === 'player') {
-          return applyGravity(cellIndex, gameState.board);
+          return { newCellIndex: applyGravity(cellIndex, gameState.board), scorePenalty: 0 };
         }
         break;
       
@@ -219,33 +219,33 @@ export const useObstacles = (
       
       case 'o018': // Center Tax
         if (cellIndex === 12 && player === 'player') {
-          setGameState(prev => ({
-            ...prev,
-            score: Math.max(0, prev.score - 2000)
-          }));
+          console.log('Center Tax applied: -2000 points');
+          return { newCellIndex: cellIndex, scorePenalty: -2000 };
         }
         break;
       
       case 'o019': // Edge Tax
-        if ([1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23].includes(cellIndex) && player === 'player') {
-          setGameState(prev => ({
-            ...prev,
-            score: Math.max(0, prev.score - 1000)
-          }));
+        if (player === 'player') {
+          const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
+          if (edges.includes(cellIndex)) {
+            console.log('Edge Tax applied: -1000 points');
+            return { newCellIndex: cellIndex, scorePenalty: -1000 };
+          }
         }
         break;
       
       case 'o020': // Corner Tax
-        if ([0, 4, 20, 24].includes(cellIndex) && player === 'player') {
-          setGameState(prev => ({
-            ...prev,
-            score: Math.max(0, prev.score - 1000)
-          }));
+        if (player === 'player') {
+          const corners = [0, 4, 20, 24];
+          if (corners.includes(cellIndex)) {
+            console.log('Corner Tax applied: -1000 points');
+            return { newCellIndex: cellIndex, scorePenalty: -1000 };
+          }
         }
         break;
     }
     
-    return cellIndex;
+    return { newCellIndex: cellIndex, scorePenalty: 0 };
   }, [gameState, setGameState]);
 
   return { initializeObstacle, processObstacle };
