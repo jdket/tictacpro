@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { validateAllEffectsAndObstacles } from '../utils/effectTestUtils';
+import { useAudio } from '../lib/stores/useAudio';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
@@ -14,6 +15,8 @@ const TicTacPro: React.FC = () => {
     setGhostPreview,
     useSpecialAbility
   } = useGameLogic();
+  
+  const { setClickSound } = useAudio();
 
   const handleCellClick = (cellIndex: number) => {
     if (gameState.phase === 'playing') {
@@ -29,7 +32,12 @@ const TicTacPro: React.FC = () => {
     // Validate all effects and obstacles logic
     const validation = validateAllEffectsAndObstacles();
     console.log('Effect/Obstacle validation completed:', validation);
-  }, []);
+    
+    // Load click sound
+    const clickAudio = new Audio('/sounds/click.mp3');
+    clickAudio.volume = 0.5;
+    setClickSound(clickAudio);
+  }, [setClickSound]);
 
   return (
     <div className="tic-tac-pro">

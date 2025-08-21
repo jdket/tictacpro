@@ -4,6 +4,7 @@ import { gameData } from '../data/gameData';
 import { checkWinningLine, checkPlayerWinningLines, checkNewWinningLines, isBoardFull, getEmptyCells } from '../utils/gameUtils';
 import { useNewEffects } from './useNewEffects';
 import { useNewObstacles } from './useNewObstacles';
+import { useAudio } from '../lib/stores/useAudio';
 
 const getRandomPositiveEffect = (): Effect => {
   // Get only positive effects (scoring, memory, wild)
@@ -88,6 +89,7 @@ export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const { processEffect, initializeEffect } = useNewEffects(gameState, setGameState);
   const { processObstacle, initializeObstacle } = useNewObstacles(gameState, setGameState);
+  const { playClick } = useAudio();
 
   const startGame = useCallback(() => {
     // Show level preview before level 1 and after each level
@@ -208,6 +210,9 @@ export const useGameLogic = () => {
 
       console.log('AI choosing cell:', aiMoveIndex);
       
+      // Play click sound for AI move
+      playClick();
+      
       const newBoard = [...prev.board];
       newBoard[aiMoveIndex] = 'O';
       
@@ -261,6 +266,9 @@ export const useGameLogic = () => {
 
       console.log('Making player move at index:', cellIndex);
       console.log('Current board before move:', prev.board);
+
+      // Play click sound for player move
+      playClick();
 
       const newBoard = [...prev.board];
       newBoard[cellIndex] = 'X';
