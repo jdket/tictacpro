@@ -219,7 +219,7 @@ export const useGameLogic = () => {
       console.log('Board after AI move:', newBoard);
       
       // Check for NEW AI O winning lines created by this move only
-      const newWinningLines = checkNewWinningLines(newBoard, 'O', aiMoveIndex, gameState.effectState.wildCells);
+      const newWinningLines = checkNewWinningLines(newBoard, 'O', aiMoveIndex, prev.effectState.wildCells);
       const lineCount = newWinningLines.length;
       
       let opponentScoreIncrease = 0;
@@ -276,8 +276,8 @@ export const useGameLogic = () => {
       const isCenter = cellIndex === 12;
       
       // Check for NEW player X winning lines created by this move only
-      console.log('Checking for X lines with wild cells:', gameState.effectState.wildCells);
-      const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex, gameState.effectState.wildCells);
+      console.log('Checking for X lines with wild cells:', prev.effectState.wildCells);
+      const newWinningLines = checkNewWinningLines(newBoard, 'X', cellIndex, prev.effectState.wildCells);
       const lineCount = newWinningLines.length;
       console.log('Found', lineCount, 'new player lines:', newWinningLines);
       
