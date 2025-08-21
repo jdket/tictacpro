@@ -7,16 +7,53 @@ export const useNewObstacles = (
   setGameState: React.Dispatch<React.SetStateAction<GameState>>
 ) => {
   
-  const processObstacle = useCallback((cellIndex: number, player: 'player' | 'ai'): { newCellIndex: number; scorePenalty: number } => {
+  const processObstacle = useCallback((cellIndex: number, player: 'player' | 'ai', winningLine?: number[] | null): { newCellIndex: number; scorePenalty: number } => {
     if (!gameState.currentObstacle) return { newCellIndex: cellIndex, scorePenalty: 0 };
     
     const obstacle = gameState.currentObstacle;
     
     switch (obstacle.id) {
+      case 'o003': // Dim Penalty - any 4-in-a-row next to Dimmed tiles loses 1000 pts
+        if (winningLine && player === 'player') {
+          const hasAdjacentDimmed = winningLine.some(cell => {
+            const adjacent = getAdjacentCells(cell);
+            return adjacent.some(adjCell => gameState.effectState.dimmedCells.includes(adjCell));
+          });
+          if (hasAdjacentDimmed) {
+            console.log('Dim Penalty applied: -1000 points');
+            return { newCellIndex: cellIndex, scorePenalty: -1000 };
+          }
+        }
+        break;
+      
+      case 'o004': // Wild Trap - any 4-in-a-row next to Wild tiles loses 1000 pts
+        if (winningLine && player === 'player') {
+          const hasAdjacentWild = winningLine.some(cell => {
+            const adjacent = getAdjacentCells(cell);
+            return adjacent.some(adjCell => gameState.effectState.wildCells.includes(adjCell));
+          });
+          if (hasAdjacentWild) {
+            console.log('Wild Trap applied: -1000 points');
+            return { newCellIndex: cellIndex, scorePenalty: -1000 };
+          }
+        }
+        break;
+      
+      case 'o006': // Wild Penalty - Wild tiles in your line subtract 1000 pts
+        if (winningLine && player === 'player') {
+          const wildInLine = winningLine.filter(cell => gameState.effectState.wildCells.includes(cell)).length;
+          if (wildInLine > 0) {
+            console.log(`Wild Penalty applied: -${wildInLine * 1000} points`);
+            return { newCellIndex: cellIndex, scorePenalty: -wildInLine * 1000 };
+          }
+        }
+        break;
+      
       case 'o007': // Edge Tax
-        if (player === 'player') {
+        if (winningLine && player === 'player') {
           const edges = [1, 2, 3, 5, 9, 10, 14, 15, 19, 21, 22, 23];
-          if (edges.includes(cellIndex)) {
+          const hasEdge = winningLine.some(cell => edges.includes(cell));
+          if (hasEdge) {
             console.log('Edge Tax applied: -1000 points');
             return { newCellIndex: cellIndex, scorePenalty: -1000 };
           }
@@ -24,9 +61,10 @@ export const useNewObstacles = (
         break;
       
       case 'o008': // Corner Tax
-        if (player === 'player') {
+        if (winningLine && player === 'player') {
           const corners = [0, 4, 20, 24];
-          if (corners.includes(cellIndex)) {
+          const hasCorner = winningLine.some(cell => corners.includes(cell));
+          if (hasCorner) {
             console.log('Corner Tax applied: -1000 points');
             return { newCellIndex: cellIndex, scorePenalty: -1000 };
           }
@@ -34,7 +72,7 @@ export const useNewObstacles = (
         break;
       
       case 'o009': // Center Tax
-        if (cellIndex === 12 && player === 'player') {
+        if (winningLine && winningLine.includes(12) && player === 'player') {
           console.log('Center Tax applied: -2000 points');
           return { newCellIndex: cellIndex, scorePenalty: -2000 };
         }
@@ -43,6 +81,23 @@ export const useNewObstacles = (
     
     return { newCellIndex: cellIndex, scorePenalty: 0 };
   }, [gameState]);
+
+  const getAdjacentCells = (cellIndex: number): number[] => {
+    const row = Math.floor(cellIndex / 5);
+    const col = cellIndex % 5;
+    const adjacent: number[] = [];
+    
+    for (let r = Math.max(0, row - 1); r <= Math.min(4, row + 1); r++) {
+      for (let c = Math.max(0, col - 1); c <= Math.min(4, col + 1); c++) {
+        const index = r * 5 + c;
+        if (index !== cellIndex && index >= 0 && index < 25) {
+          adjacent.push(index);
+        }
+      }
+    }
+    
+    return adjacent;
+  };
 
   const initializeObstacle = useCallback((obstacle: Obstacle) => {
     switch (obstacle.id) {

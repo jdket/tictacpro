@@ -54,6 +54,9 @@ const initialGameState: GameState = {
   showingFlash: false,
   boardBlinking: false,
   ghostPreview: null,
+  linesCompleted: 0,
+  streakCount: 0,
+  comboCount: 0,
   effectState: {
     safeRetryUsed: false,
     crossSwapUsed: false,
@@ -265,6 +268,8 @@ export const useGameLogic = () => {
       
       let scoreIncrease = 0;
       let newWinningLine = prev.winningLine;
+      let newLinesCompleted = prev.linesCompleted;
+      let newStreakCount = prev.streakCount;
       
       if (lineCount > 0) {
         // Base points: 1000 per line
@@ -289,7 +294,13 @@ export const useGameLogic = () => {
         newWinningLine = newWinningLines[0];
         
         console.log(`Player scored ${scoreIncrease} points for ${lineCount} NEW line(s)`);
+        
+        // Update line count and streak tracking
+        newLinesCompleted = prev.linesCompleted + lineCount;
+        newStreakCount = prev.streakCount + 1;
       } else {
+        // Reset streak if no lines scored
+        newStreakCount = 0;
         // Check for effects that trigger on any move (not just winning moves)
         const effectBonus = processEffect(cellIndex, null);
         scoreIncrease += effectBonus;
@@ -298,11 +309,15 @@ export const useGameLogic = () => {
         }
       }
       
-      // Process obstacles for scoring penalties
-      const obstacleResult = processObstacle(cellIndex, 'player');
-      scoreIncrease += obstacleResult.scorePenalty;
-      if (obstacleResult.scorePenalty < 0) {
-        console.log(`Obstacle penalty: ${obstacleResult.scorePenalty} points`);
+      // Process obstacles for scoring penalties (check for line-based penalties)
+      if (newWinningLines.length > 0) {
+        for (const line of newWinningLines) {
+          const obstacleResult = processObstacle(cellIndex, 'player', line);
+          if (obstacleResult.scorePenalty < 0) {
+            scoreIncrease += obstacleResult.scorePenalty;
+            console.log(`Obstacle penalty: ${obstacleResult.scorePenalty} points`);
+          }
+        }
       }
       
       // Check if board is complete after player move
@@ -318,7 +333,9 @@ export const useGameLogic = () => {
         usedCenter: prev.usedCenter || isCenter,
         winningLine: newWinningLine,
         score: prev.score + scoreIncrease,
-        phase: isComplete ? 'level_complete' : prev.phase
+        phase: isComplete ? 'level_complete' : prev.phase,
+        linesCompleted: newLinesCompleted,
+        streakCount: newStreakCount
       };
     });
 

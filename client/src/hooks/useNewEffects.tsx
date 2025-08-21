@@ -43,7 +43,9 @@ export const useNewEffects = (
       
       case 'e004': // Combo Counter
         // Each additional 4-in-a-row after the first gives +1000 pts
-        // This would need combo tracking in game state
+        if (winningLine && gameState.linesCompleted > 0) {
+          coins += effect.value;
+        }
         break;
       
       case 'e005': // Diagonal Bonus
@@ -68,9 +70,8 @@ export const useNewEffects = (
         break;
       
       case 'e008': // Triple Cherry
-        if (context === 'level_end') {
-          // If you score 3+ 4-in-a-rows this level, +3000 at end
-          // This would need line counting in game state
+        if (context === 'level_end' && gameState.linesCompleted >= 3) {
+          coins += effect.value;
         }
         break;
       
@@ -91,7 +92,9 @@ export const useNewEffects = (
       
       case 'e011': // Line Streak
         // Scoring on two consecutive turns gives +2000 pts
-        // This would need turn tracking
+        if (winningLine && gameState.streakCount >= 2) {
+          coins += effect.value;
+        }
         break;
       
       case 'e012': // Middle Master
@@ -105,9 +108,8 @@ export const useNewEffects = (
         break;
       
       case 'e013': // Two Line Gift
-        if (context === 'level_end') {
-          // Exactly 2 lines this level, +2000 pts
-          // This would need line counting
+        if (context === 'level_end' && gameState.linesCompleted === 2) {
+          coins += effect.value;
         }
         break;
       
@@ -203,7 +205,11 @@ export const useNewEffects = (
       case 'e023': // Wild Collector
         if (context === 'level_end') {
           // Use all 3 in different 4-in-a-rows for +3000 pts
-          // This would need tracking of which wilds were used
+          const wildCells = gameState.effectState.wildCells;
+          const usedWilds = gameState.moveHistory.filter(move => wildCells.includes(move));
+          if (usedWilds.length === 3 && gameState.linesCompleted >= 3) {
+            coins += effect.value;
+          }
         }
         break;
       

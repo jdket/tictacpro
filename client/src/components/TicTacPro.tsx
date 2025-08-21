@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
+import { validateAllEffectsAndObstacles } from '../utils/effectTestUtils';
 import GameBoard from './GameBoard';
 import DualScoreDisplay from './DualScoreDisplay';
 import LevelDisplay from './LevelDisplay';
@@ -23,6 +24,12 @@ const TicTacPro: React.FC = () => {
   const handleCellHover = (cellIndex: number | null) => {
     setGhostPreview(cellIndex);
   };
+
+  useEffect(() => {
+    // Validate all effects and obstacles logic
+    const validation = validateAllEffectsAndObstacles();
+    console.log('Effect/Obstacle validation completed:', validation);
+  }, []);
 
   return (
     <div className="tic-tac-pro">

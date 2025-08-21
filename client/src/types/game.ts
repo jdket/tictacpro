@@ -23,6 +23,9 @@ export interface GameState {
   boardBlinking: boolean;
   ghostPreview: number | null;
   effectState: EffectState;
+  linesCompleted: number;
+  streakCount: number;
+  comboCount: number;
 }
 
 export interface EffectState {
