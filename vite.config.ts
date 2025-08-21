@@ -17,22 +17,34 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "client", "src"),
-      "@shared": path.resolve(__dirname, "shared"),
-    },
+      "@shared": path.resolve(__dirname, "shared")
+    }
   },
   root: path.resolve(__dirname, "client"),
   server: {
     port: Number(process.env.PORT) || 3000,
-    host: true
+    host: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*"
+    }
   },
   preview: {
     port: Number(process.env.PORT) || 3000,
     host: true,
-    allowedHosts: ["tictacpro-production-1824.up.railway.app"]
+    allowedHosts: ["tictacpro-production-1824.up.railway.app"],
+    headers: {
+      // ✅ Allow your parent site to embed this game
+      "Content-Security-Policy": "frame-ancestors 'self' https://learnforfun.kids",
+      "X-Frame-Options": "ALLOWALL",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "*"
+    }
   },
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true
   },
+  // Add support for large assets like models, audio, shaders
   assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.mp3", "**/*.ogg", "**/*.wav"]
 });
