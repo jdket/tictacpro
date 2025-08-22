@@ -89,9 +89,17 @@ export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const { processEffect, initializeEffect } = useNewEffects(gameState, setGameState);
   const { processObstacle, initializeObstacle } = useNewObstacles(gameState, setGameState);
-  const { playClick } = useAudio();
+  const { playClick, playMusic } = useAudio();
 
   const startGame = useCallback(() => {
+    // Start music when user first clicks Start Game
+    if (gameState.currentLevel === 1 && !gameState.showLevelPreview) {
+      // Start the background music on first game start
+      setTimeout(() => {
+        playMusic();
+      }, 500);
+    }
+
     // Show level preview before level 1 and after each level
     if (gameState.currentLevel === 1 && !gameState.showLevelPreview) {
       const effects = getEffectsForLevel(1);
@@ -133,7 +141,7 @@ export const useGameLogic = () => {
         initializeObstacle(obstacles[0]);
       }
     }, 100);
-  }, [gameState.currentLevel, gameState.showLevelPreview, gameState.nextLevelEffects, gameState.nextLevelObstacles, initializeEffect, initializeObstacle]);
+  }, [gameState.currentLevel, gameState.showLevelPreview, gameState.nextLevelEffects, gameState.nextLevelObstacles, initializeEffect, initializeObstacle, playMusic]);
 
   const nextLevel = useCallback(() => {
     const nextLevelNum = gameState.currentLevel + 1;

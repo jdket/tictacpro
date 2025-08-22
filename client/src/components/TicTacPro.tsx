@@ -39,17 +39,12 @@ const TicTacPro: React.FC = () => {
     clickAudio.volume = 0.5;
     setClickSound(clickAudio);
 
-    // Load background music
+    // Load background music (but don't start playing yet)
     const musicAudio = new Audio('/sounds/soundtrack.mp3');
     musicAudio.loop = true;
     musicAudio.volume = 0.3;
     setBackgroundMusic(musicAudio);
-    
-    // Start playing music after a short delay
-    setTimeout(() => {
-      playMusic();
-    }, 1000);
-  }, [setClickSound, setBackgroundMusic, playMusic]);
+  }, [setClickSound, setBackgroundMusic]);
 
   return (
     <div className="tic-tac-pro">
