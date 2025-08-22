@@ -60,10 +60,19 @@ export const useAudio = create<AudioState>((set, get) => ({
       } else {
         // Ensure loop is maintained when resuming music
         backgroundMusic.loop = true;
-        backgroundMusic.volume = 0.3;
+        backgroundMusic.volume = 0; // Start at 0 when resuming too
         backgroundMusic.play().catch(error => {
           console.log("Music play prevented:", error);
         });
+        
+        // Fade in over 1 second when resuming
+        const fadeInInterval = setInterval(() => {
+          if (backgroundMusic.volume < 0.3) {
+            backgroundMusic.volume = Math.min(backgroundMusic.volume + 0.015, 0.3);
+          } else {
+            clearInterval(fadeInInterval);
+          }
+        }, 50); // Faster fade when resuming
       }
     }
     
@@ -126,10 +135,19 @@ export const useAudio = create<AudioState>((set, get) => ({
     const { backgroundMusic, isMusicMuted } = get();
     if (backgroundMusic && !isMusicMuted) {
       backgroundMusic.loop = true;
-      backgroundMusic.volume = 0.3;
+      backgroundMusic.volume = 0; // Start at 0 volume
       backgroundMusic.play().catch(error => {
         console.log("Music play prevented:", error);
       });
+      
+      // Fade in over 2 seconds
+      const fadeInInterval = setInterval(() => {
+        if (backgroundMusic.volume < 0.3) {
+          backgroundMusic.volume = Math.min(backgroundMusic.volume + 0.01, 0.3);
+        } else {
+          clearInterval(fadeInInterval);
+        }
+      }, 66); // ~15 frames per second for smooth fade
     }
   },
 
